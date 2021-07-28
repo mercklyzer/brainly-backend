@@ -1,0 +1,137 @@
+const knex = require('knex')({
+    client: 'mysql',
+    connection: {
+      host : 'db_server',
+      user : 'root',
+      password : 'password',
+      database : 'mydb'
+    }
+});
+
+// TO ACCESS RETURNED OF GET METHOD, USE [0][0][0]
+
+let repository = {
+    // GETS ALL QUESTIONS
+    getAllQuestions: () => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_all_questions()')
+            .then((returned) => {
+                // returns an array of questions
+                console.log(returned[0][0]);
+                fulfill(returned[0][0])
+            })
+            .catch((e) => reject(e))
+        })
+    },
+
+    // GET ALL QUESTIONS THAT MATCH THE SUBJECT
+    getQuestionsBySubject: (subject) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_questions_by_subject(?)', [subject])
+            .then((returned) => {
+                // returns an array of questions
+                fulfill(returned[0][0])
+            })
+            .catch((e) => reject(e))
+        })
+    
+    },
+
+    // ADDS A SINGLE QUESTION
+    addQuestion: (question) => {
+        return new Promise((fulfill, reject) => {
+            const questionId = question.questionId
+            const questionString = question.question
+            const subject = question.subject
+            const image = question.image
+            const rewardPoints = question.rewardPoints
+            const askerId = question.askerId
+            const username = question.username
+            const profilePicture = question.profilePicture
+            const date = question.date
+            console.log(question);
+
+            knex.raw('CALL add_question(?,?,?,?,?,?,?,?,?)', [questionId,questionString,subject,image,rewardPoints,askerId,username, profilePicture,date])
+            .then((returned) => {
+                fulfill(returned[0][0][0])
+            })
+            .catch((e) => reject(e))
+        })
+    },
+
+    // GETS A SINGLE QUESTION BASED ON ID
+    getQuestionByQuestionId : (questionId) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_question_by_question_id(?)', [questionId])
+            .then((returned) => {
+                if(returned[0][0].length > 0){
+                    fulfill(returned[0][0][0])
+                }
+                else{
+                    reject(new Error("Question does not exist."))
+                }
+            })
+            .catch((e) => reject(e))
+        })
+    },
+
+    // EDITS A SINGLE QUESTION BASED ON ID
+    editQuestion: (question) => {
+        const questionId = question.questionId
+        const newQuestion = question.newQuestion
+        const lastEdited = question.lastEdited
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL edit_question(?,?,?)', [questionId,newQuestion,lastEdited])
+            .then((returned) => {
+                fulfill(returned[0][0][0])
+            })
+            .catch((e) => reject(e))
+        })
+    },
+
+    // DELETES a question
+    deleteQuestion : (questionId) => {
+        return new Promise((fulfill, reject) => {
+            let questionObj
+            // GET THE QUESTION FIRST TO BE RETURNED
+            repository.getQuestionByQuestionId(questionId)
+            .then((question) => {
+                questionObj = question
+                return knex.raw('CALL delete_question(?)', [questionId])
+            })
+            .then(() => fulfill(questionObj))
+            .catch((e) => reject(e))
+        })
+    },
+
+    // GET all QUESTIONS of a specific user
+    getQuestionsByUser : (userId) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_questions_by_user_id(?)', [userId])
+            .then((returned) => fulfill(returned[0][0]))
+            .catch((e) => reject(e))
+        })
+    },
+
+    // updates information about who has the brainliest answer
+    updateUserBrainliest : (questionId, userId) => {
+        console.log(userId);
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL update_question_user_brainliest(?,?)', [questionId, userId])
+            .then(() => fulfill())
+            .catch((e) => reject(new Error('Cannot update question.')))
+
+        })
+    },
+
+    updateUserQuestions : (updatedUser) => {
+        const userId = updatedUser.userId
+        const username = updatedUser.newUsername
+        const profilePicture = updatedUser.newProfilePicture
+
+        return knex.raw('CALL update_user_questions(?,?,?)', [userId, username, profilePicture])
+    }
+
+}
+
+module.exports = repository
