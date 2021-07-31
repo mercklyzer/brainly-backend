@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/main.controller')
+const userController = require('../controllers/users.controller')
 
 // verify user if registered
 router.post('/', (req, res, next) => {
-  controller.login(req, res)
+  userController.login(req, res)
 })
 
 module.exports = router;

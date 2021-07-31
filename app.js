@@ -7,17 +7,15 @@ var cors = require('cors')
 const passport = require('passport');
 
 // ROUTERS
-var indexRouter = require('./routes/index');
 var signupRouter = require('./routes/signup');
 var loginRouter = require('./routes/login');
 var usersRouter = require('./routes/users');
-var questionsRouter = require('./routes/questions') //used for viewing a single question or adding a question
-var subjectsRouter = require('./routes/subjects') //used for viewing a single question or adding a question
+var questionsRouter = require('./routes/questions')
+var subjectsRouter = require('./routes/subjects')
 
 var app = express();
 
 require('./auth/passport')(passport);
-// app.use(passport.initialize)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,15 +28,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 app.use('/signup', signupRouter);
 app.use('/login', loginRouter);
 app.use('/users', usersRouter);
 app.use('/questions', questionsRouter);
 app.use('/subjects', subjectsRouter);
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

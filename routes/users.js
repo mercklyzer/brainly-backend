@@ -1,30 +1,25 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/main.controller')
+const userController = require('../controllers/users.controller')
 
-// VIEWS user
 router.get('/:id', (req,res, next) => {
-  controller.getUser(req, res)
+  userController.getUser(req, res)
 })
 
-// EDITS user information
 router.put('/:id', (req,res, next) => {
-  controller.editUser(req, res)
+  userController.editUser(req, res)
 })
 
-// DISPLATS ALL ANSWERS
 router.get('/:id/answers', (req,res, next) => {
-  controller.getAnswersByUser(req, res)
+  userController.getAnswersByUser(req, res)
 })
 
-// DISPLAYS ALL QUESTIONS
 router.get('/:id/questions', (req,res, next) => {
-  controller.getQuestionsByUser(req,res)
+  userController.getQuestionsByUser(req,res)
 })
 
-// DISPLAYS ALL QUESTIONS
 router.get('/', (req,res, next) => {
-  controller.getUsers(req,res)
+  userController.getUsers(req,res)
 })
 
 module.exports = router;

@@ -1,119 +1,104 @@
 var express = require('express');
 const passport = require('passport');
 var router = express.Router();
-const controller = require('../controllers/main.controller')
+const questionController = require('../controllers/questions.controller')
+const answerController = require('../controllers/answers.controller')
+const commentController = require('../controllers/comments.controller')
 
-// DISPLAY ALL QUESTIONS
+/* -------- START OF USING QUESTION CONTROLLER -------- */
 router.get('/', function(req, res, next) {
-  controller.displayAllQuestions(req,res)
+  questionController.displayAllQuestions(req,res)
 });
 
-// add a single question
 router.post('/', passport.authenticate('jwt', {session:false}),function(req, res, next) {
-  console.log("add question");
-  controller.addQuestion(req,res)
+  questionController.addQuestion(req,res)
 });
 
-//GETS a single question  
-router.get('/:id', passport.authenticate('jwt', {session:false}), (req,res,next) => {
-  console.log("GET");
-  
-  controller.getQuestion(req, res)
+router.get('/:id', passport.authenticate('jwt', {session:false}), (req,res,next) => { 
+  questionController.getQuestion(req, res)
 })
 
-//EDITS a single question
 router.put('/:id', (req,res,next) => {
-  console.log("EDIT");
-  controller.editQuestion(req, res)
+  questionController.editQuestion(req, res)
 })
 
-// DELETES a single question
 router.delete('/:id', (req,res,next) => {
-  console.log("DELETE");
-  controller.deleteQuestion(req, res)
+  questionController.deleteQuestion(req, res)
 })
+/* -------- END OF USING QUESTION CONTROLLER -------- */
 
-// GET ALL ANSWERS of the question Id
+/* -------- START OF USING ANSWERS CONTROLLER -------- */
 router.get('/:id/answers', (req, res, next) => {
-  controller.getAnswersByQuestionId(req, res)
+  answerController.getAnswersByQuestionId(req, res)
 })
 
-// ANSWERS a question
 router.post('/:id/answers', passport.authenticate('jwt', {session:false}), (req, res, next) => {
-  controller.addAnswer(req, res)
+  answerController.addAnswer(req, res)
 })
 
-// EDITS an answer
 router.put('/:id/answers/:answerId', (req, res, next) => {
-  console.log("EDIT answer");
-  controller.editAnswer(req, res)
+  answerController.editAnswer(req, res)
 })
 
-// DELETES an answer
 router.delete('/:id/answers/:answerId', (req, res, next) => {
-  console.log("DELETE answer");
-  controller.deleteAnswer(req, res)
-})
-
-// GETS comments of a QUESTION
-router.get('/:id/comments', (req, res, next) => {
-  console.log("GETS comments of a QUESTION");
-  controller.getCommentsByQuestionId(req, res)
-})
-
-// ADDS a comment to an ANSWER
-router.get('/:id/answers/:answerId/comments', (req, res, next) => {
-  console.log("GETS comments of an answer");
-  controller.getCommentsByAnswerId(req, res)
-})
-
-// ADDS a comment to a QUESTION
-router.post('/:id/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
-  console.log("ADD comment on a question");
-  controller.addComment(req, res, 'question')
-})
-
-// ADDS a comment to an ANSWER
-router.post('/:id/answers/:answerId/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
-  console.log("ADD comment on an answer");
-  controller.addComment(req, res, 'answer')
-})
-
-// EDITS a comment to a question
-router.put('/:id/comments/:commentId', (req, res, next) => {
-  console.log("EDIT comment on a question");
-  controller.editComment(req, res, 'question')
-})
-
-// EDITS a comment to an answer
-router.put('/:id/answers/:answerId/comments/:commentId', (req, res, next) => {
-  console.log("EDIT comment on an answer");
-  controller.editComment(req, res, 'answer')
-})
-
-// DELETES a comment to a question
-router.delete('/:id/comments/:commentId', (req, res, next) => {
-  console.log("DELETE comment on a question");
-  controller.deleteComment(req, res, 'question')
-})
-
-// DELETE a comment to an answer
-router.delete('/:id/answers/:answerId/comments/:commentId', (req, res, next) => {
-  console.log("DELETES comment on an answer");
-  controller.deleteComment(req, res, 'answer')
+  answerController.deleteAnswer(req, res)
 })
 
 // sets a brainliest answer
 router.post('/:id/answers/:answerId/brainliest', (req,res,next) => {
-  console.log("Sets a brainliest answer");
   controller.setBrainliest(req,res)
 })
 
 // adds thanks to an answer
 router.post('/:id/answers/:answerId/thank', (req,res,next) => {
-  console.log("Adds a thank to an answer");
   controller.addThank(req,res)
 })
+/* -------- END OF USING ANSWERS CONTROLLER -------- */
+
+/* -------- START OF USING COMMENTS CONTROLLER -------- */
+
+// GETS comments of a QUESTION
+router.get('/:id/comments', (req, res, next) => {
+  commentController.getCommentsByQuestionId(req, res)
+})
+
+// GETS comments of an ANSWER
+router.get('/:id/answers/:answerId/comments', (req, res, next) => {
+  commentController.getCommentsByAnswerId(req, res)
+})
+
+// ADDS a comment to a QUESTION
+router.post('/:id/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
+  commentController.addComment(req, res, 'question')
+})
+
+// ADDS a comment to an ANSWER
+router.post('/:id/answers/:answerId/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
+  commentController.addComment(req, res, 'answer')
+})
+
+// EDITS a comment to a question
+router.put('/:id/comments/:commentId', (req, res, next) => {
+  commentController.editComment(req, res, 'question')
+})
+
+// EDITS a comment to an answer
+router.put('/:id/answers/:answerId/comments/:commentId', (req, res, next) => {
+  commentController.editComment(req, res, 'answer')
+})
+
+// DELETES a comment to a question
+router.delete('/:id/comments/:commentId', (req, res, next) => {
+  commentController.deleteComment(req, res, 'question')
+})
+
+// DELETE a comment to an answer
+router.delete('/:id/answers/:answerId/comments/:commentId', (req, res, next) => {
+  commentController.deleteComment(req, res, 'answer')
+})
+
+/* -------- END OF USING COMMENTS CONTROLLER -------- */
+
 
 
 module.exports = router;
