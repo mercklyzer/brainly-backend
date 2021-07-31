@@ -55,7 +55,7 @@ const repository = {
                     fulfill(returned[0][0][0])
                 }
                 else{
-                    reject(new Error('User does not exist.'))
+                    reject({message: 'User does not exist.', code: 404})
                 }
             })
             .catch(e => reject(e))

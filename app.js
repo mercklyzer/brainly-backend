@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
-
+const passport = require('passport');
 
 // ROUTERS
 var indexRouter = require('./routes/index');
@@ -15,6 +15,9 @@ var questionsRouter = require('./routes/questions') //used for viewing a single 
 var subjectsRouter = require('./routes/subjects') //used for viewing a single question or adding a question
 
 var app = express();
+
+require('./auth/passport')(passport);
+// app.use(passport.initialize)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -1,4 +1,5 @@
 var express = require('express');
+const passport = require('passport');
 var router = express.Router();
 const controller = require('../controllers/main.controller')
 
@@ -8,13 +9,13 @@ router.get('/', function(req, res, next) {
 });
 
 // add a single question
-router.post('/', function(req, res, next) {
-  console.log("ADD");
+router.post('/', passport.authenticate('jwt', {session:false}),function(req, res, next) {
+  console.log("add question");
   controller.addQuestion(req,res)
 });
 
-//GETS a single question
-router.get('/:id', (req,res,next) => {
+//GETS a single question  
+router.get('/:id', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   console.log("GET");
   
   controller.getQuestion(req, res)
@@ -38,7 +39,7 @@ router.get('/:id/answers', (req, res, next) => {
 })
 
 // ANSWERS a question
-router.post('/:id/answers', (req, res, next) => {
+router.post('/:id/answers', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   controller.addAnswer(req, res)
 })
 
@@ -67,13 +68,13 @@ router.get('/:id/answers/:answerId/comments', (req, res, next) => {
 })
 
 // ADDS a comment to a QUESTION
-router.post('/:id/comments', (req, res, next) => {
+router.post('/:id/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   console.log("ADD comment on a question");
   controller.addComment(req, res, 'question')
 })
 
 // ADDS a comment to an ANSWER
-router.post('/:id/answers/:answerId/comments', (req, res, next) => {
+router.post('/:id/answers/:answerId/comments', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   console.log("ADD comment on an answer");
   controller.addComment(req, res, 'answer')
 })

@@ -239,7 +239,29 @@ CREATE PROCEDURE `get_question_by_question_id` (
     IN `p_questionId` VARCHAR(30)
 )
 BEGIN
-    SELECT * FROM `questions` WHERE `questionId` = `p_questionId`;
+    SELECT
+        `questions`.`questionId`,
+        `questions`.`question`,
+        `questions`.`image`,
+        `questions`.`subject`,
+        `questions`.`date`,
+        `questions`.`lastEdited`,
+        `questions`.`rewardPoints`,
+        `questions`.`askerId`,
+        `questions`.`username`,
+        `questions`.`profilePicture`,
+        `questions`.`userBrainliest`,
+        COUNT(`answers`.`answerId`) AS `answersCtr`
+    FROM `questions`
+    LEFT JOIN `answers`
+    ON `questions`.`questionId` = `answers`.`questionId`
+    WHERE `questions`.`questionId` = `p_questionId`
+    GROUP BY `questions`.`questionId`;
+
+
+
+
+
 END;
 
 -- GETTING QUESTIONS BY USER ID
@@ -413,6 +435,16 @@ DROP PROCEDURE IF EXISTS `get_answers_by_user_id`;
 CREATE PROCEDURE `get_answers_by_user_id` ( IN `p_userId` VARCHAR(30))
 BEGIN
     SELECT * FROM `answers` WHERE `userId` = `p_userId`;
+END;
+
+-- GETTING ANSWER BY QUESTION ID AND USER ID (used to check if user already answered this question)
+DROP PROCEDURE IF EXISTS `get_answer_by_question_id_and_user_id`;
+CREATE PROCEDURE `get_answer_by_question_id_and_user_id` ( 
+    IN `p_questionId` VARCHAR(30),
+    IN `p_userId` VARCHAR(30)
+)
+BEGIN
+    SELECT * FROM `answers` WHERE `userId` = `p_userId` AND `questionId` = `p_questionId`;
 END;
 
 -- ADDING AN ANSWER PROCEDURE

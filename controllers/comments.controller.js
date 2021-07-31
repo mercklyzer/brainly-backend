@@ -20,10 +20,11 @@ const userController = {
 
     getCommentsByAnswerId : (req, res) => {
         const questionId = req.params.id
+        const answerId = req.params.answerId
 
         // CHECK IF QUESTION EXISTS
         questionsRepository.getQuestionByQuestionId(questionId)
-        .then(() => commentsRepository.getCommentsByAnswerId(questionId))
+        .then(() => commentsRepository.getCommentsByAnswerId(answerId))
         .then((comments) => send.sendData(res,200,comments))
         .catch((e) => send.sendError(res,400,e.message))
     },
@@ -35,7 +36,7 @@ const userController = {
     // it denotes if the comment is for a question/answer
     addComment : (req, res, parent) => {
         // get the data from query and params
-        const userId        = req.query.userId
+        const userId        = req.user.userId
         const questionId    = req.params.id
         const answerId      = req.params.answerId
         const comment       = req.body.data

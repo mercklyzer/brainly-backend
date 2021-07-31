@@ -78,6 +78,17 @@ const repository = {
         })
     },
 
+    getAnswerByQuestionIdAndUserId : (questionId, userId) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_answer_by_question_id_and_user_id(?,?)', [questionId, userId])
+            .then((returned) => {
+                // returned contains[0][0] is a list of answers
+                fulfill(returned[0][0])
+            })
+            .catch((e) => reject(e))
+        })
+    },
+
     // GET all answers of a specific questionId
     getAnswersByQuestionId : (questionId) => {
         return new Promise((fulfill, reject) => {

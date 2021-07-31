@@ -20,15 +20,14 @@ const questionController = {
 
     // ADD a single question (POST /questions)
     addQuestion: (req, res) => {
-        
 
         // check for missing details
         if(!req.body.data.question || !req.body.data.subject || !req.body.data.rewardPoints){
             send.sendError(res,400,"Incomplete fields.")
         }
         else{
-            
-            const userId = req.query.userId
+
+            const userId = req.user.userId
             // initialize the question
             req.body.data.askerId = userId
             req.body.data.questionId = nanoid(30)
@@ -64,13 +63,31 @@ const questionController = {
 
     // GETS a single question (GET /questions/:id)
     getQuestion : (req, res) => {
+        console.log("start");
         const questionId = req.params.id
-     
+        const userId = req.user.userId
+        console.log("before get question");
+        let questionObj
+
         // get question by question Id
         questionsRepository.getQuestionByQuestionId(questionId)
-        .then((question) => send.sendData(res,200,question))
+        .then((question) => {
+            questionObj = question 
+            console.log(question);
+            // check if user already has entry in answers table
+            return answersRepository.getAnswerByQuestionIdAndUserId(questionId, userId)
+        })
+        .then((answers) => {
+            if(answers.length > 0){
+                questionObj.isUserAnswered = true
+            }
+            else{
+                questionObj.isUserAnswered = false
+            }
+            send.sendData(res,200,questionObj)
+        })
         .catch((e) =>{
-            send.sendError(res,404,e.message)
+            send.sendError(res,e.code,e.message)
         })
     },
 

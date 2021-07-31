@@ -4,6 +4,7 @@ const questionsRepository = require('../repositories/questions.repository')
 const answersRepository = require('../repositories/answers.repository')
 const commentsRepository = require('../repositories/comments.repository')
 const thanksRepository = require('../repositories/thanks.repository')
+const jwt = require('../auth/jwt')
 
 const send = require('./send')
 
@@ -29,14 +30,14 @@ const userController = {
                 // check if email is available
                 usersRepository.getUserByEmail(req.body.data.email)
                 // .then(() => reject(new Error('Email already taken.')))
-                .then(() => reject({message: 'Email already taken,', code: 409}))
+                .then(() => reject({message: 'Email already taken.', code: 409}))
                 .catch(() => fulfill())
             })                       
             .then(() =>  {
                 return new Promise((fulfill, reject) => {
                     // check if username is available
                     usersRepository.getUserByUsername(req.body.data.username)
-                    .then(() => reject({message: 'User already taken,', code: 409}))
+                    .then(() => reject({message: 'User already taken.', code: 409}))
                     .catch(() => fulfill())
                 })
             })
@@ -49,7 +50,10 @@ const userController = {
                 return usersRepository.addUser(req.body.data)
             })
             // send response
-            .then((user) => send.sendData(res,201,user))
+            .then((user) => {               
+                const token = jwt.issueJWT(user)
+                send.sendData(res,200, {user: user, token: token})
+            })
             .catch((e) => {
                 send.sendError(res,e.code,e.message)
             })
@@ -64,9 +68,6 @@ const userController = {
         }
 
         const newUsername = req.body.data.newUsername
-        const newEmail = req.body.data.newEmail
-        const newPassword = req.body.data.newPassword
-        const newLevel = req.body.data.newLevel
         const newProfilePicture = req.body.data.newProfilePicture
 
         const dataForTables = {
@@ -110,7 +111,8 @@ const userController = {
             .then((user) => {
                 console.log(user);
                 if(user.password === password){
-                    send.sendData(res,200, "User verified.")
+                    const token = jwt.issueJWT(user)
+                    send.sendData(res,200, {user: user, token: token})
                 }
                 else{
                     send.sendError(res,401,"Incorrect password.")

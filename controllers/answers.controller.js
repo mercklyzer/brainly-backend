@@ -26,7 +26,7 @@ const answerController = {
         }
         else{
             // get the data from query and params
-            const userId = req.query.userId
+            const userId = req.user.userId
             const questionId = req.params.id
             let answer = req.body.data
             let questionObj
@@ -46,7 +46,7 @@ const answerController = {
                 return new Promise((fulfill, reject) => {
                     const isUserAnswered = answers.map((answer) => answer.userId).includes(userId) || questionObj.askerId === userId
                     if(isUserAnswered){
-                        reject(new Error('Either user owns the question or user already answered this question.'))
+                        reject({message: 'Either user owns the question or user already answered this question.', code: 409})
                     }
                     else{
                         fulfill()
@@ -58,6 +58,12 @@ const answerController = {
             // INITIALIZE THE ANSWER OBJECT AND UPDATE USER'S CURRENT POINTS
             .then((user) => {
                 userObj = user
+
+                return usersRepository.updateCurrentPoints(userObj.userId, userObj.currentPoints + questionObj.rewardPoints)
+            })
+            .then(() => {
+
+           
                 answer = {
                     answerId: nanoid(30),
                     questionId : questionId,
@@ -73,7 +79,7 @@ const answerController = {
             })
             // send response
             .then(returnAnswer => send.sendData(res,200,returnAnswer))
-            .catch(e => send.sendError(res,404,e.message))
+            .catch(e => send.sendError(res,e.code,e.message))
         }
 
     },

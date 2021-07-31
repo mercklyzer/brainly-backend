@@ -17,7 +17,6 @@ let repository = {
             knex.raw('CALL get_all_questions()')
             .then((returned) => {
                 // returns an array of questions
-                console.log(returned[0][0]);
                 fulfill(returned[0][0])
             })
             .catch((e) => reject(e))
@@ -49,7 +48,6 @@ let repository = {
             const username = question.username
             const profilePicture = question.profilePicture
             const date = question.date
-            console.log(question);
 
             knex.raw('CALL add_question(?,?,?,?,?,?,?,?,?)', [questionId,questionString,subject,image,rewardPoints,askerId,username, profilePicture,date])
             .then((returned) => {
@@ -68,7 +66,7 @@ let repository = {
                     fulfill(returned[0][0][0])
                 }
                 else{
-                    reject(new Error("Question does not exist."))
+                    reject({message: "Question does not exist.", code: 404})
                 }
             })
             .catch((e) => reject(e))
@@ -115,7 +113,6 @@ let repository = {
 
     // updates information about who has the brainliest answer
     updateUserBrainliest : (questionId, userId) => {
-        console.log(userId);
         return new Promise((fulfill, reject) => {
             knex.raw('CALL update_question_user_brainliest(?,?)', [questionId, userId])
             .then(() => fulfill())
