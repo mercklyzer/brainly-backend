@@ -9,47 +9,41 @@ const jwt = require('../auth/jwt')
 const send = require('./send')
 
 const userController = {
-    // gets a user from the database
-    getUser: (req, res) => {
-        const userId = req.params.id
 
-        usersRepository.getUserByUserId(userId)
+    getUser: (req, res) => {
+        usersRepository.getUserByUserId(req.params.id)
         .then((user) => send.sendData(res,200,user))
-        .catch((e) => send.sendError(res,404,e.message))
+        .catch((e) => send.sendError(res,e.code,e.message))
     },
     
     // used in signup
     addUser: (req, res) => {
-        // check if there is a missing field
-        if(!req.body.data.username || !req.body.data.email || !req.body.data.password || !req.body.data.birthday || !req.body.data.level){
-            send.sendError(res,400,"Incomplete fields.")
+        let reqBodyCheck = userController.addUserHasMissingField(req)
+
+        if(reqBodyCheck.hasMissingField){
+            send.sendError(res, 409, reqBodyCheck.errorMessage)
         }
 
         else{
             new Promise((fulfill, reject) => {
-                // check if email is available
                 usersRepository.getUserByEmail(req.body.data.email)
-                // .then(() => reject(new Error('Email already taken.')))
                 .then(() => reject({message: 'Email already taken.', code: 409}))
                 .catch(() => fulfill())
-            })                       
+            })
             .then(() =>  {
                 return new Promise((fulfill, reject) => {
-                    // check if username is available
                     usersRepository.getUserByUsername(req.body.data.username)
                     .then(() => reject({message: 'User already taken.', code: 409}))
                     .catch(() => fulfill())
                 })
             })
-            
-            .then(() => {                                                               // initialize user entity and add user
+            .then(() => {
                 req.body.data = {
                     userId : nanoid(30),
                     ...req.body.data
                 }
                 return usersRepository.addUser(req.body.data)
             })
-            // send response
             .then((user) => {               
                 const token = jwt.issueJWT(user)
                 send.sendData(res,200, {user: user, token: token})
@@ -60,104 +54,117 @@ const userController = {
         }
     },
 
-    editUser : (req,res) => {
-        const userId = req.params.id
+    addUserHasMissingField : (req) =>{
+        let hasMissingField = false
+        let errorMessage = ''
 
+        if(!req.body.data.username){
+            errorMessage = "Username is required."
+            hasMissingField = true
+        }
+        else if (!req.body.data.email){
+            errorMessage = "Email is required."
+            hasMissingField = true
+        }
+        else if(!req.body.data.password){
+            errorMessage = "Password is required."
+            hasMissingField = true
+        }
+        else if(!req.body.data.birthday){
+            errorMessage = "Birthday is required."
+            hasMissingField = true
+        }
+        else if(!req.body.data.level){
+            errorMessage = "Level is required."
+            hasMissingField = true
+        }
+
+        return {hasMissingField, errorMessage}
+    },
+
+    editUser : (req,res) => {
+
+        // change this soon --------------------------------------------------------------------------------------------------------
         if(!req.body.data.newUsername || !req.body.data.newEmail || !req.body.data.newPassword || !req.body.data.newLevel || !req.body.data.newProfilePicture){
             send.sendError(res,400,"Incomplete fields.")
         }
 
-        const newUsername = req.body.data.newUsername
-        const newProfilePicture = req.body.data.newProfilePicture
-
         const dataForTables = {
-            userId : userId,
-            newUsername: newUsername,
-            newProfilePicture: newProfilePicture
+            userId : req.params.id,
+            newUsername: req.body.data.newUsername,
+            newProfilePicture: req.body.data.newProfilePicture
         }
 
-        // update users table
-        usersRepository.editUser(userId, req.body.data)
-        // update questions table
-        .then(() => questionsRepository.updateUserQuestions(dataForTables))
-        // update answers table
-        .then(() => answersRepository.updateUserAnswers(dataForTables))
-        // update comments table
-        .then(() => commentsRepository.updateUserComments(dataForTables))
-        // update thanks table
-        .then(() => thanksRepository.updateUserThanks(dataForTables))
-        .then(() => send.sendData(res,200,{userId: userId, ...req.body.data}))
+        let userObj
+
+        // check if user exists
+        usersRepository.getUserByUserId(req.params.id)  //change this to req.user.userID since passport jwt
+        .then((user) => {
+            userObj = user
+
+            return Promise.all([
+                usersRepository.editUser(req.params.id, req.body.data),
+                questionsRepository.updateUserQuestions(dataForTables),
+                answersRepository.updateUserAnswers(dataForTables),
+                thanksRepository.updateUserThanks(dataForTables)
+            ]) 
+        })
+        .then(() => send.sendData(res,200,{
+            ...userObj,
+            username: req.body.data.newUsername,
+            email: req.body.data.newEmail, 
+            password:req.body.data.newPassword,
+            level: req.body.data.newLevel,
+            profilePicture: req.body.data.newProfilePicture,
+        }))
         .catch((e) => send.sendError(res, 400, e.message))
     },
 
     getUsers: (req, res) => {
         usersRepository.getUsers()
-        .then((data) => {
-            send.sendData(res,200,data[0][0])
-        })
+        .then((users) => send.sendData(res,200,users))
+        .catch((e) => send.sendError(res,e.code.e.message))
     },
 
-    // CHECKS IF LOGIN CREDENTIALS MATCH (POST /login)
     login: (req, res) => {
+        // change this soon --------------------------------------------------------------------------------------------------------
         if(!req.body.data.usernameOrEmail || !req.body.data.password){
             send.sendError(res,400,"Incomplete fields.")
         }
-        else{           
-            const usernameOrEmail = req.body.data.usernameOrEmail
-            const password = req.body.data.password
-            
-            // get the password given a username if username exists
-            usersRepository.getUserByUsernameOrEmail(usernameOrEmail)
+        else{                      
+
+            usersRepository.getUserByUsernameOrEmail(req.body.data.usernameOrEmail)
             .then((user) => {
-                console.log(user);
-                if(user.password === password){
+
+                if(user.password === req.body.data.password){
                     const token = jwt.issueJWT(user)
                     send.sendData(res,200, {user: user, token: token})
                 }
                 else{
-                    send.sendError(res,401,"Incorrect password.")
+                    send.sendError(res,403,"Incorrect password.")
                 }
             })
             .catch((e) => {
-                console.log(e);
                 send.sendError(res,e.code,e.message)
             })
         }
     },
         
-    // GETS ALL ANSWERS BY A SPECIFIC USER (GET /users/:userId/answers)
     // for every answer, APPEND the questionId, questionString, and subject
     getAnswersByUser : (req, res) => {
-        const userId = req.params.id
             
-        // check if the user exists given a userId
-        usersRepository.getUserByUserId(userId)
-        // get all answers of the user given a userId
-        .then(() => answersRepository.getAnswersByUser(userId))
-        // send response
-        .then((answers) => {
-            send.sendData(res,200, answers)
-        })
-        .catch((e) => {
-            send.sendError(res,404,e.message)
-        })
+        usersRepository.getUserByUserId(req.params.id)
+        .then(() => answersRepository.getAnswersByUser(req.params.id))
+        .then((answers) => send.sendData(res,200, answers))
+        .catch((e) => send.sendError(res,404,e.message))
     },
 
-    // GET ALL QUESTIONS BY A SPECIFIC USER (GET /users/:userId/questions)
     getQuestionsByUser : (req, res) => {
-        const userId = req.params.id
 
-        // check if the user exists given a userId
-        usersRepository.getUserByUserId(userId)
-        // get all answers of the user given a userId
+        usersRepository.getUserByUserId(req.params.id)
         .then(() => questionsRepository.getQuestionsByUser(userId))
-        // send response
-        .then((questions) => {
-            send.sendData(res,200, questions)
-        })
-        .catch((e) => {
-            send.sendError(res,404,e.message)
-        })
+        .then((questions) => send.sendData(res,200, questions))
+        .catch((e) => send.sendError(res,404,e.message))
     }
 }
 
