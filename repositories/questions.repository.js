@@ -31,7 +31,7 @@ let repository = {
                 // returns an array of questions
                 fulfill(returned[0][0])
             })
-            .catch((e) => reject(e))
+            .catch(() => reject({message: 'Error getting the questions by subject', code: 500}))
         })
     
     },
@@ -50,10 +50,8 @@ let repository = {
             const date = question.date
 
             knex.raw('CALL add_question(?,?,?,?,?,?,?,?,?)', [questionId,questionString,subject,image,rewardPoints,askerId,username, profilePicture,date])
-            .then((returned) => {
-                fulfill(returned[0][0][0])
-            })
-            .catch((e) => reject(e))
+            .then(() => fulfill())
+            .catch(() => reject({message:'Error adding the question', code:500}))
         })
     },
 
@@ -69,7 +67,7 @@ let repository = {
                     reject({message: "Question does not exist.", code: 404})
                 }
             })
-            .catch((e) => reject(e))
+            .catch(() => reject({message: "Error getting the question.", code: 500}))
         })
     },
 
@@ -80,25 +78,17 @@ let repository = {
         const lastEdited = question.lastEdited
         return new Promise((fulfill, reject) => {
             knex.raw('CALL edit_question(?,?,?)', [questionId,newQuestion,lastEdited])
-            .then((returned) => {
-                fulfill(returned[0][0][0])
-            })
-            .catch((e) => reject(e))
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error editing the question.', code: 500}))
         })
     },
 
     // DELETES a question
     deleteQuestion : (questionId) => {
         return new Promise((fulfill, reject) => {
-            let questionObj
-            // GET THE QUESTION FIRST TO BE RETURNED
-            repository.getQuestionByQuestionId(questionId)
-            .then((question) => {
-                questionObj = question
-                return knex.raw('CALL delete_question(?)', [questionId])
-            })
-            .then(() => fulfill(questionObj))
-            .catch((e) => reject(e))
+            knex.raw('CALL delete_question(?)', [questionId])
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error deleting the question.', code: 500}))
         })
     },
 
@@ -107,7 +97,7 @@ let repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL get_questions_by_user_id(?)', [userId])
             .then((returned) => fulfill(returned[0][0]))
-            .catch((e) => reject(e))
+            .catch(() => reject({message: 'Error getting the questions of the user.', code: 500}))
         })
     },
 
@@ -116,17 +106,16 @@ let repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL update_question_user_brainliest(?,?)', [questionId, userId])
             .then(() => fulfill())
-            .catch((e) => reject(new Error('Cannot update question.')))
-
+            .catch(() => reject({message: 'Error updating the question\'s brainliest.', code: 500}))
         })
     },
 
     updateUserQuestions : (updatedUser) => {
-        const userId = updatedUser.userId
-        const username = updatedUser.newUsername
-        const profilePicture = updatedUser.newProfilePicture
-
-        return knex.raw('CALL update_user_questions(?,?,?)', [userId, username, profilePicture])
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL update_user_questions(?,?,?)', [updatedUser.userId, updatedUser.newUsername, updatedUser.newProfilePicture])
+            .then(() => fulfill())
+            .catch(() =>  reject({message: 'Error updating the questions of a user', code: 500}))
+        })
     }
 
 }

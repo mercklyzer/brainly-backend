@@ -311,7 +311,6 @@ CREATE PROCEDURE `add_question` (
 BEGIN
     INSERT INTO `questions` (`questionId`, `question`, `subject`, `image`, `rewardPoints`, `askerId`, `username`, `profilePicture`, `date`)
     VALUES (`p_questionId`, `p_question`, `p_subject`, `p_image`, `p_rewardPoints`, `p_askerId`, `p_username`, `p_profilePicture`, `p_date`);
-    SELECT * FROM `questions` WHERE `questionId` = `p_questionId`;
 END;
 
 -- EDITING A QUESTION PROCEDURE
@@ -323,7 +322,6 @@ CREATE PROCEDURE `edit_question` (
 )
 BEGIN
     UPDATE `questions` SET `question` = `p_newQuestion`, `lastEdited` = `p_lastEdited` WHERE `questionId` = `p_questionId`;
-    SELECT * FROM `questions` WHERE `questionId` = `p_questionId`;
 END;
 
 -- DELETING A QUESTION PROCEDURE
