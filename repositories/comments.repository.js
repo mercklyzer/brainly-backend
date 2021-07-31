@@ -76,12 +76,11 @@ const repository = {
 
         return new Promise((fulfill, reject) => {
             knex.raw('CALL add_comment(?,?,?,?,?,?,?,?,?)', [commentId,commentString, userId, username, profilePicture, questionId, answerId, parent, date])
-            .then((returned) => {
-                fulfill(comment)
+            .then(() => {
+                fulfill()
             })
-            .catch((e) => {
-                console.log(e);
-                reject(new Error('Cannot add comment.'))
+            .catch(() => {
+                reject({message: 'Error adding the comment.', code: 500})
             })
         })    
     },

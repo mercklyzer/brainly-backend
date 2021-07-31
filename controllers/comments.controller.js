@@ -9,83 +9,60 @@ const send = require('./send')
 
 const userController = {
     getCommentsByQuestionId : (req, res) => {
-        const questionId = req.params.id
 
-        // CHECK IF QUESTION EXISTS
-        questionsRepository.getQuestionByQuestionId(questionId)
-        .then(() => commentsRepository.getCommentsByQuestionId(questionId))
+        commentsRepository.getCommentsByQuestionId(req.params.id)
         .then((comments) => send.sendData(res,200,comments))
         .catch((e) => send.sendError(res,400,e.message))
     },
 
     getCommentsByAnswerId : (req, res) => {
-        const questionId = req.params.id
-        const answerId = req.params.answerId
-
-        // CHECK IF QUESTION EXISTS
-        questionsRepository.getQuestionByQuestionId(questionId)
-        .then(() => commentsRepository.getCommentsByAnswerId(answerId))
+        commentsRepository.getCommentsByAnswerId(req.params.answerId)
         .then((comments) => send.sendData(res,200,comments))
         .catch((e) => send.sendError(res,400,e.message))
     },
 
-    // ADDS a comment to either a question or an answer
-    // (POST /questions/:id/comments) to add comment to a question
-    // (POST /questions/:id/answers/:answerId/comments) to add comment to an answer
     // parent is a string that is either "question" or "answer"
-    // it denotes if the comment is for a question/answer
     addComment : (req, res, parent) => {
-        // get the data from query and params
-        const userId        = req.user.userId
-        const questionId    = req.params.id
-        const answerId      = req.params.answerId
-        const comment       = req.body.data
+        let comment = req.body.data
+        comment.userId = req.user.userId
         
-        // initialize comment
-        comment.userId = userId
-        
-        // initialize date
         const dateNow = new Date().getTime()
         comment.date = dateNow
 
-        // comment to a question
         if(parent === 'question'){
-            comment.questionId = questionId
+            comment.questionId = req.params.id
             comment.answerId = null
             comment.parent = 'question'
         }
 
-        // comment to an answer
         else if(parent === 'answer'){
-            comment.answerId = answerId
-            comment.questionId = questionId
+            comment.answerId = req.params.answerId
+            comment.questionId = req.params.id
             comment.parent = 'answer'
         }
 
-        // get the question to check if question exists
-        questionsRepository.getQuestionByQuestionId(questionId)    
+        // check if question (and answer) exists
+        questionsRepository.getQuestionByQuestionId(req.params.id)    
         .then(() => {
-            // check if answer exists if parent === answer
             return new Promise((fulfill, reject) => {
                 if(parent === 'answer'){
-                    fulfill(answersRepository.getAnswerByAnswerId(answerId))
+                    fulfill(answersRepository.getAnswerByAnswerId(req.params.answerId))
                 }
                 else{
                     fulfill()
                 }
             })
-        })         
-        .then(() => usersRepository.getUserByUserId(userId))        // get username of userId
-        .then((user) => {
-            comment.username = user.username                        // save the username
-            comment.commentId = nanoid(30)
-            comment.profilePicture = user.profilePicture
-            return commentsRepository.addComment(comment)           // add Comment
         })
 
-        // send response
-        .then((returnComment) => send.sendData(res,200,returnComment))
-        .catch((e) => send.sendError(res,404,e.message))
+        .then(() => usersRepository.getUserByUserId(req.user.userId))
+        .then((user) => {
+            comment.username = user.username
+            comment.commentId = nanoid(30)
+            comment.profilePicture = user.profilePicture
+            return commentsRepository.addComment(comment)
+        })
+        .then(() => send.sendData(res,200,comment))
+        .catch((e) => send.sendError(res,e.code,e.message))
     },
 
     // EDITS a comment 
