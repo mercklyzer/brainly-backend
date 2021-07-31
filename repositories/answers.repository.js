@@ -49,9 +49,7 @@ const repository = {
             const date = answer.date
 
             knex.raw('CALL add_answer(?,?,?,?,?,?,?,?,?)', [answerId,answerString,questionId,questionString,subject,userId,username,profilePicture,date])
-            .then((returned) => {
-                fulfill(returned[0][0][0])
-            })
+            .then(() => fulfill())
             .catch((e) => reject(e))
         })
     },

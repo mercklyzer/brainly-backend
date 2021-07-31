@@ -461,7 +461,6 @@ CREATE PROCEDURE `add_answer` (
 BEGIN
     INSERT INTO `answers` (`answerId`,`answer`,`questionId`,`question`, `subject`,`userId`,`userName`, `profilePicture`, `date`)
     VALUES (`p_answerId`,`p_answer`,`p_questionId`,`p_question`, `p_subject`,`p_userId`,`p_userName`, `p_profilePicture`, `p_date`);
-    SELECT * FROM `answers` WHERE `answerId` = `p_answerId`;
 END;
 
 -- EDITING AN ANSWER PROCEDURE

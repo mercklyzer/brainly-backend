@@ -10,41 +10,31 @@ const send = require('./send')
 
 const answerController = {
     getAnswersByQuestionId : (req,res) => {
-        const questionId = req.params.id
-
-        // check if question exists
-        questionsRepository.getQuestionByQuestionId(questionId)
-        .then(() => answersRepository.getAnswersByQuestionId(questionId))
+        questionsRepository.getQuestionByQuestionId(req.params.id)
+        .then(() => answersRepository.getAnswersByQuestionId(req.params.id))
         .then((answers) => send.sendData(res,200,answers))
         .catch((e) => send.sendError(res,400,e.message))
     },
 
-    // ANSWERS a question/Adds an answer (POST /questions/:id/answers)
     addAnswer: (req, res) => {
         if(!req.body.data.answer){
-            send.sendError(res,400,'Incomplete fields.')
+            send.sendError(res,400,'Updated answer is required.')
         }
         else{
-            // get the data from query and params
-            const userId = req.user.userId
-            const questionId = req.params.id
             let answer = req.body.data
             let questionObj
             let userObj
     
-            // GET THE QUESTION
-            questionsRepository.getQuestionByQuestionId(questionId)
-            // GET ANSWERS TO THE QUESTION
+            questionsRepository.getQuestionByQuestionId(req.params.id)
             .then((question) => {
                 questionObj = question
                 
-                return answersRepository.getAnswersByQuestionId(questionId)
+                return answersRepository.getAnswersByQuestionId(req.params.id)
             })
-            // CHECK IF USER === ASKER
-            // CHECK IF USER ALREADY ANSWERED THE QUESTION
             .then((answers) => {
                 return new Promise((fulfill, reject) => {
-                    const isUserAnswered = answers.map((answer) => answer.userId).includes(userId) || questionObj.askerId === userId
+                    // check if user owns the question or already answered the question
+                    const isUserAnswered = answers.map((answer) => answer.userId).includes(req.user.userId) || questionObj.askerId === req.user.userId
                     if(isUserAnswered){
                         reject({message: 'Either user owns the question or user already answered this question.', code: 409})
                     }
@@ -53,23 +43,18 @@ const answerController = {
                     }
                 })
             })
-            // INITIALIZE THE ANSWER OBJECT
-            .then(() => usersRepository.getUserByUserId(userId))
-            // INITIALIZE THE ANSWER OBJECT AND UPDATE USER'S CURRENT POINTS
+            .then(() => usersRepository.getUserByUserId(req.user.userId))
             .then((user) => {
                 userObj = user
-
                 return usersRepository.updateCurrentPoints(userObj.userId, userObj.currentPoints + questionObj.rewardPoints)
             })
-            .then(() => {
-
-           
+            .then(() => {           
                 answer = {
                     answerId: nanoid(30),
-                    questionId : questionId,
+                    questionId : req.params.id,
                     question: questionObj.question,
                     subject: questionObj.subject,
-                    userId : userId,
+                    userId : req.user.userId,
                     username : userObj.username,
                     profilePicture: userObj.profilePicture,
                     date: new Date().getTime(),
@@ -77,8 +62,7 @@ const answerController = {
                 }
                 return answersRepository.addAnswer(answer)
             })
-            // send response
-            .then(returnAnswer => send.sendData(res,200,returnAnswer))
+            .then(() => send.sendData(res,200,answer))
             .catch(e => send.sendError(res,e.code,e.message))
         }
 
@@ -182,7 +166,6 @@ const answerController = {
         let answerObj
         let userObj //this will contain the user that owns the ANSWER (NOT THE QUESION)
 
-        // get the question
         questionsRepository.getQuestionByQuestionId(questionId)
         .then((question) => {
             questionObj = question
@@ -193,46 +176,43 @@ const answerController = {
             answerObj = answer
 
             return new Promise((fulfill, reject) => {
-                // check if answer belongs to the question
+                let errorMessage
+
                 if(answerObj.questionId === questionObj.questionId){
-                    // check if question.askerId !== answer.userId (asker must not own the question)
-                    if(questionObj.askerId !== answerObj.userId){
-                        // check if question.userBrainliest (only 1 answer is brainliest)
-                        if(!questionObj.userBrainliest){
-                            // check if the userId owns the question
-                            if(questionObj.askerId === userId){
-                                fulfill()
-                            }
-                            else{
-                                reject(new Error('User does not own the question.'))
-                            }
-                        }
-                        else{
-                            reject(new Error('Question has already its brainliest answer.'))
-                        }
-                    }
-                    else{
-                        reject(new Error('Asker cannot set provide own answer or even set its own answer as brainliest.'))
-                    }
+                    errorMessage = 'Question does not own this answer.'
+                }
+
+                else if(questionObj.askerId !== answerObj.userId){
+                    errorMessage = 'Asker cannot set provide own answer or even set its own answer as brainliest.'
+                }
+
+                else if(!questionObj.userBrainliest){
+                    errorMessage = 'Question has already its brainliest answer.'
+                }
+
+                else if(questionObj.askerId !== userId){
+                    errorMessage = 'User does not own the question.'
+                }
+
+                if(errorMessage){
+                    reject({message: errorMessage, code: 401})
                 }
                 else{
-                    reject(new Error('Question does not own this answer.'))
+                    fulfill()
                 }
             })
         })
-        // update question's userBrainliest = answerObj.userId
         .then(() => {
-            return questionsRepository.updateUserBrainliest(questionId, answerObj.userId)
+            Promise.all([
+                questionsRepository.updateUserBrainliest(questionId, answerObj.userId), 
+                answersRepository.updateIsBrainliest(answerId)
+            ])
+            .then(() => send.sendData(res,200,"Question has just set its brainliest answer."))
+            .catch((e) => send.sendError(res,e.code,e.message))
         })
-        // update answer's isBrainliest
-        .then(() => {
-            return answersRepository.updateIsBrainliest(answerId)
-        })
-        .then(() => {
-            send.sendData(res,200,"Question has just set its brainliest answer.")
-        })
-        .catch((e) => send.sendError(res,400,e.message))
+        .catch((e) => send.sendError(res,e.code,e.message))
     },
+
 
     addThank: (req,res) => {
         const questionId = req.params.id
