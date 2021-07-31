@@ -5,6 +5,7 @@ const answersRepository = require('../repositories/answers.repository')
 const commentsRepository = require('../repositories/comments.repository')
 const thanksRepository = require('../repositories/thanks.repository')
 const jwt = require('../auth/jwt')
+const bcrypt = require('bcryptjs');
 
 const send = require('./send')
 
@@ -40,7 +41,8 @@ const userController = {
             .then(() => {
                 req.body.data = {
                     userId : nanoid(30),
-                    ...req.body.data
+                    ...req.body.data,
+                    password: bcrypt.hashSync(req.body.data.password, bcrypt.genSaltSync(10))
                 }
                 return usersRepository.addUser(req.body.data)
             })
@@ -106,6 +108,7 @@ const userController = {
                 usersRepository.editUser(req.params.id, req.body.data),
                 questionsRepository.updateUserQuestions(dataForTables),
                 answersRepository.updateUserAnswers(dataForTables),
+                commentsRepository.updateUserComments(dataForTables),
                 thanksRepository.updateUserThanks(dataForTables)
             ]) 
         })
@@ -127,16 +130,16 @@ const userController = {
     },
 
     login: (req, res) => {
+        
         // change this soon --------------------------------------------------------------------------------------------------------
         if(!req.body.data.usernameOrEmail || !req.body.data.password){
             send.sendError(res,400,"Incomplete fields.")
         }
         else{                      
-
+            
             usersRepository.getUserByUsernameOrEmail(req.body.data.usernameOrEmail)
             .then((user) => {
-
-                if(user.password === req.body.data.password){
+                if(bcrypt.compareSync(req.body.data.password, user.password )){
                     const token = jwt.issueJWT(user)
                     send.sendData(res,200, {user: user, token: token})
                 }
