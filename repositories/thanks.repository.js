@@ -41,7 +41,11 @@ const repository = {
     },
 
     deleteThanksByQuestionId : (questionId) => {
-        return knex.raw('CALL delete_thanks_by_question_id(?)', [questionId])
+        return new Promise((fulfill,reject) => {
+            knex.raw('CALL delete_thanks_by_question_id(?)', [questionId])
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error deleting thanks by question id', code: 500}))
+        })
     },
 
     updateUserThanks : (updatedUser) => {

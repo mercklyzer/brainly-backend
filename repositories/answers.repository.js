@@ -141,7 +141,11 @@ const repository = {
     },
     
     deleteAnswersByQuestionId : (questionId) => {
-        return knex.raw('CALL delete_answers_by_question_id(?)', [questionId])
+        return new Promise((fulfill,reject) => {
+            knex.raw('CALL delete_answers_by_question_id(?)', [questionId])
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error deleting answers by question id', code: 500}))
+        })
     },
 
     updateIsBrainliest : (answerId) => {

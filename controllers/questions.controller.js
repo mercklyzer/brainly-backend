@@ -123,13 +123,16 @@ const questionController = {
             }
         })
         .then(() => send.sendData(res,200,questionObj))
-        .catch((e) => send.sendData(res,e.code,e.message))
+        .catch((e) => {
+            console.log("error here");
+            send.sendError(res,e.code,e.message)
+        })
     },
 
     getQuestionsBySubject : (req,res) => {
         questionsRepository.getQuestionsBySubject(req.params.subject)
         .then((questions) => send.sendData(res,200,questions))
-        .catch((e) => send.sendData(res,e.code, e.message))
+        .catch((e) => send.sendError(res,e.code, e.message))
     },
 }
 
