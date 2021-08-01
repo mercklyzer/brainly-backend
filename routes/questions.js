@@ -22,7 +22,7 @@ router.put('/:id', (req,res,next) => {
   questionController.editQuestion(req, res)
 })
 
-router.delete('/:id', (req,res,next) => {
+router.delete('/:id', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   questionController.deleteQuestion(req, res)
 })
 /* -------- END OF USING QUESTION CONTROLLER -------- */

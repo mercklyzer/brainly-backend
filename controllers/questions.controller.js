@@ -110,6 +110,7 @@ const questionController = {
             questionObj = question
 
             if(questionObj.askerId === req.user.userId){
+                console.log("check if owner");
                 return Promise.all([
                     answersRepository.deleteAnswersByQuestionId(questionId),
                     thanksRepository.deleteThanksByQuestionId(questionId),
