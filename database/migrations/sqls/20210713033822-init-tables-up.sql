@@ -223,14 +223,16 @@ BEGIN
         `questions`
             LEFT JOIN
         `answers` ON `questions`.`questionId` = `answers`.`questionId`
-    GROUP BY `questions`.`questionId`;
+    GROUP BY `questions`.`questionId`
+    ORDER BY `date` DESC;
 END;
 
 -- GETTING QUESTIONS BY SUBJECT PROCEDURE
 DROP PROCEDURE IF EXISTS `get_questions_by_subject`;
 CREATE PROCEDURE `get_questions_by_subject` (IN `p_subject` VARCHAR(30))
 BEGIN
-    SELECT * FROM `questions` where `subject` = `p_subject`;
+    SELECT * FROM `questions` where `subject` = `p_subject`
+    ORDER BY `date` DESC;
 END;
 
 -- GETTING A QUESTION BY QUESTION ID PROCEDURE
@@ -425,7 +427,8 @@ BEGIN
     LEFT JOIN `thanks`
     ON `answers`.`answerId` = `thanks`.`answerId`
     WHERE `answers`.`questionId` = `p_questionId`
-    GROUP BY `answers`.`answerId`;
+    GROUP BY `answers`.`answerId`
+    ORDER BY `date` ASC;
 END;
 
 -- GETTING ANSWERS BY USER ID
@@ -567,7 +570,8 @@ CREATE PROCEDURE `get_comments_by_question_id` (
     IN `p_questionId` VARCHAR(30)
 )
 BEGIN
-    SELECT * FROM `comments` WHERE `questionId` = `p_questionId` AND `parent` = "question";
+    SELECT * FROM `comments` WHERE `questionId` = `p_questionId` AND `parent` = "question"
+    ORDER BY `date` ASC;
 END;
 
 -- GETTING COMMENTS BY ANSWER ID PROCEDURE
@@ -576,7 +580,8 @@ CREATE PROCEDURE `get_comments_by_answer_id` (
     IN `p_answerId` VARCHAR(30)
 )
 BEGIN
-    SELECT * FROM `comments` WHERE `answerId` = `p_answerId` AND `parent` = "answer";
+    SELECT * FROM `comments` WHERE `answerId` = `p_answerId` AND `parent` = "answer"
+    ORDER BY `date` ASC;
 END;
 
 -- ADDING A SINGLE COMMENT PROCEDURE
