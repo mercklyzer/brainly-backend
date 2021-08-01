@@ -18,7 +18,7 @@ router.get('/:id', passport.authenticate('jwt', {session:false}), (req,res,next)
   questionController.getQuestion(req, res)
 })
 
-router.put('/:id', (req,res,next) => {
+router.put('/:id', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   questionController.editQuestion(req, res)
 })
 

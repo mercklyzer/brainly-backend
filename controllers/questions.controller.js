@@ -73,7 +73,7 @@ const questionController = {
     editQuestion : (req, res) => {
         // change this soon -------------------------------------------------------------------------------------
         if(!req.body.data.newQuestion){
-            send.sendError(res,400,"Incomplete fields.")
+            send.sendError(res,400,"New question is required.")
         }
         else{
             const newQuestion = {
@@ -95,7 +95,7 @@ const questionController = {
                     }
                 })
             })
-            .then((updatedQuestion) => send.sendData(res,200,updatedQuestion))
+            .then(() => send.sendData(res,200,newQuestion))
             .catch((e) => send.sendError(res,e.code,e.message))
         }
     },
