@@ -46,12 +46,12 @@ router.delete('/:id/answers/:answerId', (req, res, next) => {
 
 // sets a brainliest answer
 router.post('/:id/answers/:answerId/brainliest', (req,res,next) => {
-  controller.setBrainliest(req,res)
+  answerController.setBrainliest(req,res)
 })
 
 // adds thanks to an answer
-router.post('/:id/answers/:answerId/thank', (req,res,next) => {
-  controller.addThank(req,res)
+router.post('/:id/answers/:answerId/thank', passport.authenticate('jwt', {session:false}), (req,res,next) => {
+  answerController.addThank(req,res)
 })
 /* -------- END OF USING ANSWERS CONTROLLER -------- */
 

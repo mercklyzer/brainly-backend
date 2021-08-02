@@ -18,12 +18,11 @@ const repository = {
                     fulfill(returned[0][0][0])
                 }
                 else{
-                    console.log("none");
-                    reject(new Error('Thank does not exist.'))
+                    reject({message: 'Thank does not exist.',code: 404})
                 }
             })
-            .catch((e) => {
-                reject(e)
+            .catch(() => {
+                reject({message: 'Error getting thanks of the thanker to this answer.', code:500})
             })
         })
     },
@@ -37,7 +36,17 @@ const repository = {
         const answerId = thankObj.answerId
         const answerUserId = thankObj.answerUserId
 
-        return knex.raw('CALL add_thank(?,?,?,?,?,?,?)', [thankId, thankerId, thankerUsername, thankerProfilePicture, questionId, answerId, answerUserId])
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL add_thank(?,?,?,?,?,?,?)', [thankId, thankerId, thankerUsername, thankerProfilePicture, questionId, answerId, answerUserId])
+            .then(() => {
+                fulfill()
+            })
+            .catch((e) =>{
+                console.log(e);
+                reject({message: 'Error adding thanks to this answer.', code: 500})
+            })
+        })
+
     },
 
     deleteThanksByQuestionId : (questionId) => {

@@ -33,7 +33,8 @@ VALUES
 ('2', 'lababa11', '12345', 'lalabbaa@gmail.com', DATE('1999-12-12'), '/sample2.jpg', 'College', 40,  0),
 ('3', 'lyzer0101', '12345', 'rezyl1116@gmail.com', DATE('1979-1-11'), '/sample3.jpg', 'College', 857,  0),
 ('4', 'nani0101', 'xdmap123', 'nani@gmail.com', DATE('2001-12-12'), '/sample4.jpg', 'Senior High', 12,  0),
-('5', 'account5', '12345', 'account5@gmail.com', DATE('2001-12-12'), '/sample5.jpg', 'Senior High', 42,  0);
+('5', 'account5', '12345', 'account5@gmail.com', DATE('2001-12-12'), '/sample5.jpg', 'Senior High', 42,  0),
+('MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc1@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0);
 
 -- GETTING ALL USERS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_users`;
@@ -420,15 +421,17 @@ BEGIN
         `answers`.`username`,
         `answers`.`profilePicture`,
         `answers`.`date`,
+        `answers`.`lastEdited`,
         `answers`.`isBrainliest`,
-        GROUP_CONCAT(`thanks`.`thankerUsername`) `thankerUsernames`,
-        GROUP_CONCAT(`thanks`.`thankerProfilePicture`) `thankerProfilePictures`
+        COUNT(`thanks`.`thankId`) AS `thanksCtr`,
+        GROUP_CONCAT(`thanks`.`thankerUsername`) AS `thankerUsername`,
+        GROUP_CONCAT(`thanks`.`thankerProfilePicture`) AS `thankerProfilePicture`
     FROM `answers`
     LEFT JOIN `thanks`
     ON `answers`.`answerId` = `thanks`.`answerId`
     WHERE `answers`.`questionId` = `p_questionId`
     GROUP BY `answers`.`answerId`
-    ORDER BY `date` ASC;
+    ORDER BY `answers`.`isBrainliest` DESC, `thanksCtr` DESC, `date` DESC;
 END;
 
 -- GETTING ANSWERS BY USER ID
@@ -681,7 +684,8 @@ INSERT INTO `thanks` (
 VALUES 
 ('1', '1', 'merck123', '/sample1.jpg', '1', '1', '2'),
 ('2', '4', 'nani0101', '/sample4.jpg', '1', '1', '2'),
-('3', '3', 'lyzer0101', '/sample3.jpg', '1', '1', '2');
+('3', '3', 'lyzer0101', '/sample3.jpg', '1', '1', '2'),
+('4', 'MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '', '1', '1', '2');
 
 -- GETTING A THANK RECORD FOR CHECKING IF USER ALREADY THANKED THE SAME ANSWER PROCEDURE
 DROP PROCEDURE IF EXISTS `get_thank_by_thanker_id_and_answer_user_id`;

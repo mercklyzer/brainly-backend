@@ -12,8 +12,17 @@ const answerController = {
     getAnswersByQuestionId : (req,res) => {
         questionsRepository.getQuestionByQuestionId(req.params.id)
         .then(() => answersRepository.getAnswersByQuestionId(req.params.id))
-        .then((answers) => send.sendData(res,200,answers))
-        .catch((e) => send.sendError(res,400,e.message))
+        .then((answers) => {
+            answers = answers.map((answer) => {
+                return {
+                    ...answer,
+                    thankerUsername: answer.thankerUsername !== null? answer.thankerUsername.split(',') : [],
+                    thankerProfilePicture: answer.thankerProfilePicture !== null? answer.thankerProfilePicture.split(',') : []
+                }
+            })
+            send.sendData(res,200,answers)
+        })
+        .catch((e) => send.sendError(res,e.code,e.message))
     },
 
     addAnswer: (req, res) => {
@@ -215,68 +224,56 @@ const answerController = {
 
 
     addThank: (req,res) => {
-        const questionId = req.params.id
-        const answerId = req.params.answerId
-        const userId = req.query.userId
 
-        let userObj
         let answerObj
         let thankObj
 
-        // check if question owns the answer
-        answersRepository.getAnswerByAnswerId(answerId)
+        answersRepository.getAnswerByAnswerId(req.params.answerId)
         .then((answer) => {
             answerObj = answer
             return new Promise((fulfill, reject) => {
-                if(answerObj.questionId === questionId){
+                if(answerObj.questionId === req.params.id){
                     fulfill()
                 }
                 else{
-                    reject(new Error('Question does not own the answer.'))
+                    reject({message: 'Question does not own the answer.', code:404})
                 }
             })
         })
-        // check if userId !== answer.userId (user does not own his answer)
         .then(() => {
             return new Promise((fulfill, reject) => {
-                if(answerObj.userId !== userId){
+                if(answerObj.userId !== req.user.userId){
                     fulfill()
                 }
                 else{
-                    reject(new Error('User cannot thanks his own answer.'))
+                    reject({message: 'User cannot thank his own answer.', code:403})
                 }
             })
         })
-        // check if user did not thank the answer yet (getThankBy thankerId and answerId)
         .then(() => {
             return new Promise((fulfill, reject) => {
-                thanksRepository.getThankByThankerIdAndAnswerUserId(userId, answerObj.answerId)
+                thanksRepository.getThankByThankerIdAndAnswerUserId(req.user.userId, answerObj.answerId)
                 .then(() => {
-                    reject(new Error("User already thanked this answer."))
+                    reject({message: "User already thanked this answer.", code:403})
                 })
                 .catch(() => fulfill())
             })
         })
-        // get user object
         .then(() => {
-            return usersRepository.getUserByUserId(userId)
-        })
-        .then((user) => {
-            userObj = user
             thankObj = {
                 thankId: nanoid(30),
-                thankerId: userId,
-                thankerUsername: userObj.username,
-                thankerProfilePicture: userObj.profilePicture,
-                questionId: questionId,
+                thankerId: req.user.userId,
+                thankerUsername: req.user.username,
+                thankerProfilePicture: req.user.profilePicture,
+                questionId: req.params.id,
                 answerId : answerObj.answerId,
                 answerUserId : answerObj.userId
             }
-            // insert to thanks table
+
             return thanksRepository.addThank(thankObj)
         })
         .then(() => send.sendData(res,200,thankObj))
-        .catch((e) => send.sendError(res,400,e.message))
+        .catch((e) => send.sendError(res,e.code,e.message))
     }
 }
 

@@ -58,7 +58,6 @@ const questionController = {
             return answersRepository.getAnswerByQuestionIdAndUserId(req.params.id, req.user.userId)
         })
         .then((answers) => {
-            // check if user already has entry in answers table
             if(answers.length > 0){
                 questionObj.isUserAnswered = true
             }

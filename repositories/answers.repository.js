@@ -25,16 +25,6 @@ const repository = {
         })
     },
 
-    getAnswersByQuestionId : (questionId) => {
-        return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_answers_by_question_id(?)', [questionId])
-            .then((returned) => {
-                fulfill(returned[0][0])
-            })
-            .catch((e) => reject(e))
-        })
-    },
-
     // ADDS an answer
     addAnswer: (answer) => {
         return new Promise((fulfill, reject) => {
@@ -92,6 +82,7 @@ const repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL get_answers_by_question_id(?)', [questionId])
             .then((returned) => {
+                console.log(returned);
                 // returned contains[0][0] is a list of answers
                 fulfill(returned[0][0])
             })
