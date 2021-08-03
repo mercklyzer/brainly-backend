@@ -28,7 +28,7 @@ router.delete('/:id', passport.authenticate('jwt', {session:false}), (req,res,ne
 /* -------- END OF USING QUESTION CONTROLLER -------- */
 
 /* -------- START OF USING ANSWERS CONTROLLER -------- */
-router.get('/:id/answers', (req, res, next) => {
+router.get('/:id/answers', passport.authenticate('jwt', {session:false}), (req, res, next) => {
   answerController.getAnswersByQuestionId(req, res)
 })
 
@@ -44,12 +44,10 @@ router.delete('/:id/answers/:answerId', (req, res, next) => {
   answerController.deleteAnswer(req, res)
 })
 
-// sets a brainliest answer
 router.post('/:id/answers/:answerId/brainliest', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   answerController.setBrainliest(req,res)
 })
 
-// adds thanks to an answer
 router.post('/:id/answers/:answerId/thank', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   answerController.addThank(req,res)
 })

@@ -104,41 +104,27 @@ CREATE PROCEDURE `get_user_by_user_id` (
     IN `p_user_id` VARCHAR(64)
 )
 BEGIN
-SELECT 
-    `t`.`userId`,
-    `t`.`username`,
-    `t`.`email`,
-    `t`.`password`,
-    `t`.`profilePicture`,
-    `t`.`birthday`,
-    `t`.`level`,
-    `t`.`currentPoints`,
-    SUM(`t`.`isBrainliest`) `brainliestCtr`,
-    SUM(`t`.`isAnswer`) `answersCtr`
-FROM
-    (SELECT 
-        `users`.`userId`,
-            `users`.`username`,
-            `users`.`email`,
-            `users`.`password`,
-            `users`.`profilePicture`,
-            `users`.`birthday`,
-            `users`.`level`,
-            `users`.`currentPoints`,
-            CASE
-                WHEN `answers`.`isBrainliest` IS NULL THEN 0
-                ELSE `answers`.`isBrainliest`
-            END AS `isBrainliest`,
-            CASE
-                WHEN `answers`.`isAnswer` IS NULL THEN 0
-                ELSE `answers`.`isAnswer`
-            END AS `isAnswer`
-    FROM
-        `users`
-    LEFT JOIN `answers` ON `users`.`userId` = `answers`.`userId`
-    WHERE `users`.`userId` = `p_user_id`) AS t
-GROUP BY `t`.`userId`;
+	DECLARE answersCtr INT DEFAULT 0;
+    DECLARE brainliestCtr INT DEFAULT 0;
+    
+    SELECT COALESCE(sum(brainliestCtr), 0) , COALESCE(COUNT(*), 0) INTO brainliestCtr, answersCtr
+	FROM answers
+	WHERE userId = p_user_id;
 
+	SELECT  
+		`users`.`userId`,
+		`users`.`username`,
+		`users`.`email`,
+		`users`.`password`,
+		`users`.`profilePicture`,
+		`users`.`birthday`,
+		`users`.`level`,
+		`users`.`currentPoints`,
+		brainliestCtr,
+		answersCtr
+
+		FROM `users`
+        WHERE `users`.`userId` = `p_user_id`;
 END;
 
 -- UPDATING USER'S ANSWER CTR PROCEDURE
@@ -223,14 +209,9 @@ BEGIN
         `questions`.`username`,
         `questions`.`subject`,
         `questions`.`date`,
-        `questions`.`rewardPoints`,
-        GROUP_CONCAT(`answers`.`username`) `answerUsernames`,
-        GROUP_CONCAT(`answers`.`profilePicture`) `answerProfilePictures`
+        `questions`.`rewardPoints`
     FROM
         `questions`
-            LEFT JOIN
-        `answers` ON `questions`.`questionId` = `answers`.`questionId`
-    GROUP BY `questions`.`questionId`
     ORDER BY `date` DESC;
 END;
 
@@ -248,6 +229,12 @@ CREATE PROCEDURE `get_question_by_question_id` (
     IN `p_questionId` VARCHAR(30)
 )
 BEGIN
+	DECLARE answersCtr INT DEFAULT 0;
+	
+	SELECT COUNT(*) INTO answersCtr
+    FROM `answers`
+    WHERE `answers`.`questionId` = `p_questionId`;
+    
     SELECT
         `questions`.`questionId`,
         `questions`.`question`,
@@ -259,48 +246,26 @@ BEGIN
         `questions`.`askerId`,
         `questions`.`username`,
         `questions`.`profilePicture`,
-        `questions`.`userBrainliest`,
-        COUNT(`answers`.`answerId`) AS `answersCtr`
-    FROM `questions`
-    LEFT JOIN `answers`
-    ON `questions`.`questionId` = `answers`.`questionId`
-    WHERE `questions`.`questionId` = `p_questionId`
-    GROUP BY `questions`.`questionId`;
-
-
-
-
-
+        answersCtr,
+        `questions`.`userBrainliest`
+        FROM `questions`
+    WHERE `questions`.`questionId` = `p_questionId`;
 END;
 
 -- GETTING QUESTIONS BY USER ID
 DROP PROCEDURE IF EXISTS `get_questions_by_user_id`;
 CREATE PROCEDURE `get_questions_by_user_id` ( IN `p_userId` VARCHAR(30))
 BEGIN
-    SELECT 
-        `t`.`userId`,
-        `t`.`questionId`,
-        `t`.`question`,
-        `t`.`subject`,
-        `t`.`date`,
-        GROUP_CONCAT(`answers`.`username`) `usernames`,
-        GROUP_CONCAT(`answers`.`profilePicture`) `profilePictures`
-    FROM
-    (
-        SELECT 
-            `users`.`userId`,
-            `questions`.`questionId`,
-            `questions`.`question`,
-            `questions`.`subject`,
-            `questions`.`date`
-        FROM
-            `users`
-                INNER JOIN
-            `questions` ON `users`.`userId` = `questions`.`askerId`
-        WHERE `users`.`userId` = `p_userId`) AS `t`
-    INNER JOIN `answers`
-    ON `t`.`questionId` = `answers`.`questionId`
-    GROUP BY `t`.`questionId`;
+	SELECT 
+		`questions`.`askerId`,
+		`questions`.`questionId`,
+		`questions`.`question`,
+		`questions`.`subject`,
+		`questions`.`date`
+	FROM
+		`questions`
+	WHERE `questions`.`askerId` = `p_userId`
+    ORDER BY questions.date;
 END;
 
 -- ADDING A QUESTION PROCEDURE
@@ -421,7 +386,7 @@ END;
 
 -- GETTING ANSWERS BY QUESTION ID
 DROP PROCEDURE IF EXISTS `get_answers_by_question_id`;
-CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30))
+CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30), IN `p_userId` VARCHAR(30))
 BEGIN
     SELECT 
         `answers`.`answerId`,
@@ -436,8 +401,9 @@ BEGIN
         `answers`.`lastEdited`,
         `answers`.`isBrainliest`,
         COUNT(`thanks`.`thankId`) AS `thanksCtr`,
-        GROUP_CONCAT(`thanks`.`thankerUsername`) AS `thankerUsername`,
-        GROUP_CONCAT(`thanks`.`thankerProfilePicture`) AS `thankerProfilePicture`
+        CASE WHEN EXISTS(
+			SELECT * FROM thanks WHERE thankerId = `p_userId` AND answerId = answers.answerId
+        ) THEN 1 ELSE 0 END AS isUserThanked
     FROM `answers`
     LEFT JOIN `thanks`
     ON `answers`.`answerId` = `thanks`.`answerId`

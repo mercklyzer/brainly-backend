@@ -78,9 +78,9 @@ const repository = {
     },
 
     // GET all answers of a specific questionId
-    getAnswersByQuestionId : (questionId) => {
+    getAnswersByQuestionId : (questionId, userId) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_answers_by_question_id(?)', [questionId])
+            knex.raw('CALL get_answers_by_question_id(?,?)', [questionId, userId])
             .then((returned) => {
                 console.log(returned);
                 // returned contains[0][0] is a list of answers
@@ -97,7 +97,7 @@ const repository = {
             .then((returned) => {
                 fulfill(returned[0][0])
             })
-            .catch((e) => reject(e))
+            .catch((e) => reject({message: 'Error getting answers of a user', code: 500}))
         })
     },
 

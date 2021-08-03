@@ -159,7 +159,7 @@ const userController = {
         usersRepository.getUserByUserId(req.params.id)
         .then(() => answersRepository.getAnswersByUser(req.params.id))
         .then((answers) => send.sendData(res,200, answers))
-        .catch((e) => send.sendError(res,404,e.message))
+        .catch((e) => send.sendError(res,e.code,e.message))
     },
 
     getQuestionsByUser : (req, res) => {

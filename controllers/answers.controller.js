@@ -10,16 +10,10 @@ const send = require('./send')
 
 const answerController = {
     getAnswersByQuestionId : (req,res) => {
+        console.log(req.user.userId);
         questionsRepository.getQuestionByQuestionId(req.params.id)
-        .then(() => answersRepository.getAnswersByQuestionId(req.params.id))
+        .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId))
         .then((answers) => {
-            answers = answers.map((answer) => {
-                return {
-                    ...answer,
-                    thankerUsername: answer.thankerUsername !== null? answer.thankerUsername.split(',') : [],
-                    thankerProfilePicture: answer.thankerProfilePicture !== null? answer.thankerProfilePicture.split(',') : []
-                }
-            })
             send.sendData(res,200,answers)
         })
         .catch((e) => send.sendError(res,e.code,e.message))
