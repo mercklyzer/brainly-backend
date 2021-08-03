@@ -101,16 +101,19 @@ END;
 -- GETTING A USER BY USER ID PROCEDURE
 DROP PROCEDURE IF EXISTS `get_user_by_user_id`;
 CREATE PROCEDURE `get_user_by_user_id` (
-    IN `p_user_id` VARCHAR(64)
+    IN `p_user_id` VARCHAR(110)
 )
 BEGIN
 	DECLARE answersCtr INT DEFAULT 0;
     DECLARE brainliestCtr INT DEFAULT 0;
+    DECLARE thanksCtr INT DEFAULT 0;
     
-    SELECT COALESCE(sum(brainliestCtr), 0) , COALESCE(COUNT(*), 0) INTO brainliestCtr, answersCtr
-	FROM answers
-	WHERE userId = p_user_id;
+    SELECT COALESCE(sum(answers.isBrainliest), 0) , COALESCE(COUNT(*), 0) INTO brainliestCtr, answersCtr
+	FROM `answers`
+	WHERE `userId` = `p_user_id`;
 
+	SELECT COALESCE(COUNT(*),0) INTO `thanksCtr` FROM `thanks` WHERE `thanks`.`answerUserId` = `p_user_id`;
+    
 	SELECT  
 		`users`.`userId`,
 		`users`.`username`,
@@ -119,9 +122,10 @@ BEGIN
 		`users`.`profilePicture`,
 		`users`.`birthday`,
 		`users`.`level`,
-		`users`.`currentPoints`,
 		brainliestCtr,
-		answersCtr
+		answersCtr,
+        thanksCtr,
+		`users`.`currentPoints`
 
 		FROM `users`
         WHERE `users`.`userId` = `p_user_id`;
@@ -405,7 +409,7 @@ BEGIN
         `answers`.`isBrainliest`,
         (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr,
         CASE WHEN EXISTS(
-			SELECT * FROM thanks WHERE thankerId = p_userId AND questionId = p_questionId
+			SELECT * FROM thanks WHERE thankerId = p_userId AND thanks.answerId = answers.answerId
         ) THEN 1 ELSE 0 END AS isUserThanked
     FROM `answers`
     WHERE `answers`.`questionId` = `p_questionId`

@@ -46,6 +46,7 @@ const repository = {
             knex.raw('CALL get_user_by_user_id(?)', [userId])
             .then((returned) => {
                 if(returned[0][0].length > 0){
+                    console.log(returned[0][0][0]);
                     fulfill(returned[0][0][0])
                 }
                 else{
