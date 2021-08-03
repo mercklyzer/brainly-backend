@@ -164,42 +164,41 @@ const answerController = {
         .catch(e => send.sendError(res,404,e.message))
     },
 
-    // sets an answer as brainliest
-    // POST /questions/:id/answers/:answerId/brainliest
     setBrainliest : (req, res) => {
         const questionId = req.params.id
         const answerId = req.params.answerId
-        const userId = req.query.userId
 
         let questionObj
         let answerObj
-        let userObj //this will contain the user that owns the ANSWER (NOT THE QUESION)
 
         questionsRepository.getQuestionByQuestionId(questionId)
         .then((question) => {
             questionObj = question
             return answersRepository.getAnswerByAnswerId(answerId)
         })
-        // get the answer
+
         .then((answer) => {
             answerObj = answer
 
             return new Promise((fulfill, reject) => {
                 let errorMessage
 
-                if(answerObj.questionId === questionObj.questionId){
+                if(answerObj.questionId !== questionObj.questionId){
+                    console.log(answerObj.questionId);
+                    console.log(questionObj.questionId);
                     errorMessage = 'Question does not own this answer.'
                 }
 
-                else if(questionObj.askerId !== answerObj.userId){
+                else if(questionObj.askerId === answerObj.userId){
                     errorMessage = 'Asker cannot set provide own answer or even set its own answer as brainliest.'
                 }
 
-                else if(!questionObj.userBrainliest){
+                else if(questionObj.userBrainliest){
+                    console.log(questionObj.userBrainliest);
                     errorMessage = 'Question has already its brainliest answer.'
                 }
 
-                else if(questionObj.askerId !== userId){
+                else if(questionObj.askerId !== req.user.userId){
                     errorMessage = 'User does not own the question.'
                 }
 

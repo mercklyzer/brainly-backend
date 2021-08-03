@@ -34,7 +34,12 @@ VALUES
 ('3', 'lyzer0101', '12345', 'rezyl1116@gmail.com', DATE('1979-1-11'), '/sample3.jpg', 'College', 857,  0),
 ('4', 'nani0101', 'xdmap123', 'nani@gmail.com', DATE('2001-12-12'), '/sample4.jpg', 'Senior High', 12,  0),
 ('5', 'account5', '12345', 'account5@gmail.com', DATE('2001-12-12'), '/sample5.jpg', 'Senior High', 42,  0),
-('MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc1@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0);
+('MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc1@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
+('abcdefghi-OvMhADTT1LWCgAm371fD', 'demoAcc2', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc2@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
+('xxcdefghi-xxMhADTT1LWCgAm371fD', 'demoAcc3', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc3@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
+('aaadxxghi-xxfffDTT1LWxgAm37111', 'demoAcc4', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc4@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
+('123dxxghi-xxfffDTT1LW22Am17111', 'demoAcc5', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc5@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
+('xyzdxxghi-xxf44DTT1LWCgAm37111', 'demoAcc6', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc6@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0);
 
 -- GETTING ALL USERS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_users`;
@@ -204,7 +209,8 @@ VALUES
 ('3','What is internet?', 'computer-science', 23, '1', 'merck123', '/sample1.jpg',1626251966085, null),
 ('4','What is a network?', 'computer-science', 12, '2', 'lababa11', '/sample2.jpg',1626251966085, null),
 ('5','How to sort an array?', 'computer-science', 16, '2', 'lababa11', '/sample2.jpg',1626251966085, null),
-('6','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N', 'english', 16, '2', 'lababa11', '/sample2.jpg',1626251969201, null);
+('6','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N', 'english', 16, '2', 'lababa11', '/sample2.jpg',1626251969201, null),
+('7','Can I set a brainliest answer?', 'english', 16, 'MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '', 1627955736476, null);
 
 -- GETTING ALL QUESTIONS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_all_questions`;
@@ -397,7 +403,13 @@ VALUES
 ('2','Another answer', '1', 'When did Rizal die?','history','3', 'lyzer0101', '/sample3.jpg',0, 1626251966120),
 ('3','Answer again.', '1', 'When did Rizal die?', 'history','4', 'nani0101', '/sample4.jpg',0, 1626251966120),
 ('4','Brainliest answer.', '2', 'What is a computer?', 'computer-science', '2', 'lababa11','/sample2.jpg', 1, 1626251966120),
-('5','Answer to the question.', '3', 'What is internet??', 'computer-science', '2', 'lababa11', '/sample2.jpg',1, 1626251966120);
+('5','Answer to the question.', '3', 'What is internet??', 'computer-science', '2', 'lababa11', '/sample2.jpg',1, 1626251966120),
+('6','Definitely, yes. -demoAcc2', '7', 'Can I set a brainliest answer?', 'english', 'abcdefghi-OvMhADTT1LWCgAm371fD', 'demoAcc2', '',0, 1627955736500),
+('7','Maybe? -demoAcc3', '7', 'Can I set a brainliest answer?', 'english', 'xxcdefghi-xxMhADTT1LWCgAm371fD', 'demoAcc3', '',0, 1627955736501),
+('8','Yes. Try it! -demoAcc4', '7', 'Can I set a brainliest answer?', 'english', 'aaadxxghi-xxfffDTT1LWxgAm37111', 'demoAcc4', '',0, 1627955736511),
+('9','I think so. -demoAcc5', '7', 'Can I set a brainliest answer?', 'english', '123dxxghi-xxfffDTT1LW22Am17111', 'demoAcc5', '',0, 1627955736522),
+('10','Yes. Tell me if it worked. -demoAcc6', '7', 'Can I set a brainliest answer?', 'english', 'xyzdxxghi-xxf44DTT1LWCgAm37111', 'demoAcc6', '',0, 1627955736529);
+
 
 -- GETING AN ANSWER BY QUESTION ID
 

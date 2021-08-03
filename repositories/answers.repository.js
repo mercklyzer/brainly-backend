@@ -18,10 +18,10 @@ const repository = {
                     fulfill(returned[0][0][0])
                 }
                 else{
-                    reject(new Error('Answer does not exist.'))
+                    reject({message: 'Answer does not exist.',code: 404})
                 }
             })
-            .catch((e) => reject(e))
+            .catch((e) => reject({message: 'Cannot get the answer by answerId.',code: 500}))
         })
     },
 
@@ -145,7 +145,7 @@ const repository = {
             .then(() => {
                 fulfill()
             })
-            .catch((e) => reject(e))
+            .catch((e) => reject({message: 'Cannot update the answer to be brainliest.', code: 500}))
         })
     },
 

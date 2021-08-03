@@ -45,7 +45,7 @@ router.delete('/:id/answers/:answerId', (req, res, next) => {
 })
 
 // sets a brainliest answer
-router.post('/:id/answers/:answerId/brainliest', (req,res,next) => {
+router.post('/:id/answers/:answerId/brainliest', passport.authenticate('jwt', {session:false}), (req,res,next) => {
   answerController.setBrainliest(req,res)
 })
 
