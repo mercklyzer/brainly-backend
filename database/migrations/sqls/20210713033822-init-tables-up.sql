@@ -258,10 +258,13 @@ CREATE PROCEDURE `get_questions_by_user_id` ( IN `p_userId` VARCHAR(30))
 BEGIN
 	SELECT 
 		`questions`.`askerId`,
+        `questions`.`username`,
+        `questions`.`profilePicture`,
 		`questions`.`questionId`,
 		`questions`.`question`,
 		`questions`.`subject`,
-		`questions`.`date`
+		`questions`.`date`,
+        (SELECT COUNT(*) AS answersCtr FROM answers WHERE answers.questionId = questions.questionId) AS answersCtr
 	FROM
 		`questions`
 	WHERE `questions`.`askerId` = `p_userId`
@@ -400,15 +403,12 @@ BEGIN
         `answers`.`date`,
         `answers`.`lastEdited`,
         `answers`.`isBrainliest`,
-        COUNT(`thanks`.`thankId`) AS `thanksCtr`,
+        (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr,
         CASE WHEN EXISTS(
-			SELECT * FROM thanks WHERE thankerId = `p_userId` AND answerId = answers.answerId
+			SELECT * FROM thanks WHERE thankerId = p_userId AND questionId = p_questionId
         ) THEN 1 ELSE 0 END AS isUserThanked
     FROM `answers`
-    LEFT JOIN `thanks`
-    ON `answers`.`answerId` = `thanks`.`answerId`
     WHERE `answers`.`questionId` = `p_questionId`
-    GROUP BY `answers`.`answerId`
     ORDER BY `answers`.`isBrainliest` DESC, `thanksCtr` DESC, `date` DESC;
 END;
 
@@ -416,7 +416,21 @@ END;
 DROP PROCEDURE IF EXISTS `get_answers_by_user_id`;
 CREATE PROCEDURE `get_answers_by_user_id` ( IN `p_userId` VARCHAR(30))
 BEGIN
-    SELECT * FROM `answers` WHERE `userId` = `p_userId`;
+    SELECT 
+        `answers`.`answerId`,
+        `answers`.`answer`,
+        `answers`.`questionId`,
+        `answers`.`question`,
+        `answers`.`subject`,
+        `answers`.`userId`,
+        `answers`.`username`,
+        `answers`.`profilePicture`,
+        `answers`.`date`,
+        `answers`.`isBrainliest`,
+        (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr
+    FROM `answers`
+    WHERE `answers`.`userId` = `p_userId`
+    ORDER BY `date` DESC;
 END;
 
 -- GETTING ANSWER BY QUESTION ID AND USER ID (used to check if user already answered this question)

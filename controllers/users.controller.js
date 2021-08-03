@@ -153,9 +153,7 @@ const userController = {
         }
     },
         
-    // for every answer, APPEND the questionId, questionString, and subject
     getAnswersByUser : (req, res) => {
-            
         usersRepository.getUserByUserId(req.params.id)
         .then(() => answersRepository.getAnswersByUser(req.params.id))
         .then((answers) => send.sendData(res,200, answers))
@@ -165,9 +163,9 @@ const userController = {
     getQuestionsByUser : (req, res) => {
 
         usersRepository.getUserByUserId(req.params.id)
-        .then(() => questionsRepository.getQuestionsByUser(userId))
+        .then(() => questionsRepository.getQuestionsByUser(req.params.id))
         .then((questions) => send.sendData(res,200, questions))
-        .catch((e) => send.sendError(res,404,e.message))
+        .catch((e) => send.sendError(res,e.code,e.message))
     }
 }
 

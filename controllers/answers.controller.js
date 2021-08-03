@@ -32,7 +32,7 @@ const answerController = {
             .then((question) => {
                 questionObj = question
                 
-                return answersRepository.getAnswersByQuestionId(req.params.id)
+                return answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId)
             })
             .then((answers) => {
                 return new Promise((fulfill, reject) => {
