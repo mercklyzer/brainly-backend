@@ -8,38 +8,13 @@ CREATE TABLE `users` (
     `email`  VARCHAR(64) NOT NULL,
     `profilePicture` VARCHAR(110) DEFAULT '',
     `password` VARCHAR(110) NOT NULL,
-    `birthday` DATE NOT NULL,
-    `level` ENUM('Junior High', 'Senior High', 'College'),
     `currentPoints` INT DEFAULT 90,
-    `thanksCtr` INT DEFAULT 0,
 
     PRIMARY KEY (`userId`)
 );
 
--- INITIAL ENTRIES OF THE USERS TABLE
-INSERT INTO `users` (
-    `userId`,
-    `username`,
-    `password`,
-    `email`,
-    `birthday`,
-    `profilePicture`,
-    `level`,
-    `currentPoints`,
-    `thanksCtr`
-)
-VALUES 
-('1', 'merck123', '12345', 'merck123@gmail.com', DATE('1999-12-12'), '/sample1.jpg', 'Senior High', 90,  0),
-('2', 'lababa11', '12345', 'lalabbaa@gmail.com', DATE('1999-12-12'), '/sample2.jpg', 'College', 40,  0),
-('3', 'lyzer0101', '12345', 'rezyl1116@gmail.com', DATE('1979-1-11'), '/sample3.jpg', 'College', 857,  0),
-('4', 'nani0101', 'xdmap123', 'nani@gmail.com', DATE('2001-12-12'), '/sample4.jpg', 'Senior High', 12,  0),
-('5', 'account5', '12345', 'account5@gmail.com', DATE('2001-12-12'), '/sample5.jpg', 'Senior High', 42,  0),
-('MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc1@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
-('abcdefghi-OvMhADTT1LWCgAm371fD', 'demoAcc2', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc2@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
-('xxcdefghi-xxMhADTT1LWCgAm371fD', 'demoAcc3', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc3@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
-('aaadxxghi-xxfffDTT1LWxgAm37111', 'demoAcc4', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc4@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
-('123dxxghi-xxfffDTT1LW22Am17111', 'demoAcc5', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc5@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0),
-('xyzdxxghi-xxf44DTT1LWCgAm37111', 'demoAcc6', '$2a$10$6/6dinzdwF747hRHcGxK1uTww1s25Wx9gctgp5UuAmHuslFMU9ei6', 'demoAcc6@yahoo.com', DATE('1999-12-12'), '', 'Junior High', 90,  0);
+CREATE INDEX idx_email ON `users` (`email`); 
+CREATE INDEX idx_username ON `users` (`username`); 
 
 -- GETTING ALL USERS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_users`;
@@ -56,13 +31,11 @@ CREATE PROCEDURE `add_user` (
     IN `p_password` VARCHAR(110),
     IN `p_email`  VARCHAR(64),
     IN `p_profilePicture` VARCHAR(110),
-    IN `p_birthday` DATE,
-    IN `p_level` ENUM('Junior High', 'Senior High', 'College')
+    IN `p_currentPoints` INT
 )
 BEGIN
-    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `birthday`, `level`) 
-    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_birthday`, `p_level`);
-    SELECT * FROM `users` WHERE `userId` = `p_userId`;
+    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `currentPoints`) 
+    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_currentPoints`);
 END;
 
 -- EDITING A USER PROCEDURE
@@ -131,16 +104,6 @@ BEGIN
         WHERE `users`.`userId` = `p_user_id`;
 END;
 
--- UPDATING USER'S ANSWER CTR PROCEDURE
-DROP PROCEDURE IF EXISTS `update_user_answers_ctr`;
-CREATE PROCEDURE `update_user_answers_ctr` (
-    IN `p_user_id` VARCHAR(30),
-    IN `p_new_answers_ctr` INT
-)
-BEGIN
-    UPDATE `users` SET `answersCtr` = `p_new_answers_ctr` WHERE `userId` = `p_user_id`;
-END;
-
 -- UPDATING USER'S CURRENT POINTS PROCEDURE
 DROP PROCEDURE IF EXISTS `update_user_current_points`;
 CREATE PROCEDURE `update_user_current_points` (
@@ -168,7 +131,6 @@ DROP TABLE IF EXISTS `questions`;
 CREATE TABLE `questions` (
     `questionId` VARCHAR(30) NOT NULL,
     `question` VARCHAR(1000) NOT NULL,
-    `image`  VARCHAR(100) DEFAULT '',
     `subject` VARCHAR(30) NOT NULL,
     `date` BIGINT(20),
     `lastEdited` BIGINT(20),
@@ -176,31 +138,14 @@ CREATE TABLE `questions` (
     `askerId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(30) NOT NULL,
     `profilePicture` VARCHAR(110),
-    `userBrainliest` VARCHAR(30) DEFAULT NULL,
+    `hasBrainliest` BOOLEAN DEFAULT false,
 
     PRIMARY KEY (`questionId`)
 );
 
--- INITIAL ENTRIES ON QUESTIONS
-INSERT INTO `questions` (
-    `questionId`,
-    `question`,
-    `subject`,
-    `rewardPoints`,
-    `askerId`,
-    `username`,
-    `profilePicture`,
-    `date`,
-    `userBrainliest`
-)
-VALUES
-('1','When did Rizal die?', 'history', 10, '1', 'merck123', '/sample1.jpg', 1626251966085, null),
-('2','What is a computer?', 'computer-science', 15, '1', 'merck123', '/sample1.jpg', 1626251966085, '2'),
-('3','What is internet?', 'computer-science', 23, '1', 'merck123', '/sample1.jpg',1626251966085, null),
-('4','What is a network?', 'computer-science', 12, '2', 'lababa11', '/sample2.jpg',1626251966085, null),
-('5','How to sort an array?', 'computer-science', 16, '2', 'lababa11', '/sample2.jpg',1626251966085, null),
-('6','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N', 'english', 16, '2', 'lababa11', '/sample2.jpg',1626251969201, null),
-('7','Can I set a brainliest answer?', 'english', 16, 'MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '', 1627955736476, null);
+CREATE INDEX idx_date ON `questions` (`date`);
+CREATE INDEX idx_subject ON `questions` (`subject`);
+CREATE INDEX idx_askerId_date ON `questions` (`askerId`, `date`);
 
 -- GETTING ALL QUESTIONS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_all_questions`;
@@ -251,7 +196,7 @@ BEGIN
         `questions`.`username`,
         `questions`.`profilePicture`,
         answersCtr,
-        `questions`.`userBrainliest`
+        `questions`.`hasBrainliest`
         FROM `questions`
     WHERE `questions`.`questionId` = `p_questionId`;
 END;
@@ -272,7 +217,7 @@ BEGIN
 	FROM
 		`questions`
 	WHERE `questions`.`askerId` = `p_userId`
-    ORDER BY questions.date;
+    ORDER BY questions.date DESC;
 END;
 
 -- ADDING A QUESTION PROCEDURE
@@ -281,7 +226,6 @@ CREATE PROCEDURE `add_question` (
     IN `p_questionId` VARCHAR(30),
     IN `p_question` VARCHAR(1000),
     IN `p_subject` VARCHAR(30),
-    IN `p_image` VARCHAR(110),
     IN `p_rewardPoints` INT,
     IN `p_askerId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
@@ -290,8 +234,8 @@ CREATE PROCEDURE `add_question` (
     
 )
 BEGIN
-    INSERT INTO `questions` (`questionId`, `question`, `subject`, `image`, `rewardPoints`, `askerId`, `username`, `profilePicture`, `date`)
-    VALUES (`p_questionId`, `p_question`, `p_subject`, `p_image`, `p_rewardPoints`, `p_askerId`, `p_username`, `p_profilePicture`, `p_date`);
+    INSERT INTO `questions` (`questionId`, `question`, `subject`, `rewardPoints`, `askerId`, `username`, `profilePicture`, `date`)
+    VALUES (`p_questionId`, `p_question`, `p_subject`,  `p_rewardPoints`, `p_askerId`, `p_username`, `p_profilePicture`, `p_date`);
 END;
 
 -- EDITING A QUESTION PROCEDURE
@@ -317,11 +261,10 @@ END;
 -- UPDATING QUESTION USER BRAINLIEST PROCEDURE
 DROP PROCEDURE IF EXISTS `update_question_user_brainliest`;
 CREATE PROCEDURE `update_question_user_brainliest` (
-    IN `p_questionId` VARCHAR(30),
-    IN `p_userId` VARCHAR(30)
+    IN `p_questionId` VARCHAR(30)
 )
 BEGIN
-    UPDATE `questions` SET `userBrainliest` = `p_userId` WHERE `questionId` = `p_questionId`;
+    UPDATE `questions` SET `hasBrainliest` = 1 WHERE `questionId` = `p_questionId`;
 END;
 
 -- UPDATING USER INFO ON QUESTIONS PROCEDURE
@@ -349,39 +292,13 @@ CREATE TABLE `answers` (
     `username` VARCHAR(16) NOT NULL,
     `profilePicture` VARCHAR(110) DEFAULT '',
     `date` BIGINT(20) NOT NULL,
-    `lastEdited` BIGINT(20),
     `isBrainliest` BOOLEAN DEFAULT false,
-    `isAnswer` BOOLEAN DEFAULT true,
-    
 
     PRIMARY KEY (`answerId`)
 );
 
--- INITIAL ENTRIES FOR ANSWERS
-INSERT INTO `answers` (
-    `answerId`,
-    `answer`,
-    `questionId`,
-    `question`,
-    `subject`,
-    `userId`,
-    `userName`,
-    `profilePicture`,
-    `isBrainliest`,
-    `date`
-)
-VALUES
-('1','I have a dream.', '1', 'When did Rizal die?', 'history','2', 'lababa11','/sample2.jpg', 0, 1626251966120),
-('2','Another answer', '1', 'When did Rizal die?','history','3', 'lyzer0101', '/sample3.jpg',0, 1626251966120),
-('3','Answer again.', '1', 'When did Rizal die?', 'history','4', 'nani0101', '/sample4.jpg',0, 1626251966120),
-('4','Brainliest answer.', '2', 'What is a computer?', 'computer-science', '2', 'lababa11','/sample2.jpg', 1, 1626251966120),
-('5','Answer to the question.', '3', 'What is internet??', 'computer-science', '2', 'lababa11', '/sample2.jpg',1, 1626251966120),
-('6','Definitely, yes. -demoAcc2', '7', 'Can I set a brainliest answer?', 'english', 'abcdefghi-OvMhADTT1LWCgAm371fD', 'demoAcc2', '',0, 1627955736500),
-('7','Maybe? -demoAcc3', '7', 'Can I set a brainliest answer?', 'english', 'xxcdefghi-xxMhADTT1LWCgAm371fD', 'demoAcc3', '',0, 1627955736501),
-('8','Yes. Try it! -demoAcc4', '7', 'Can I set a brainliest answer?', 'english', 'aaadxxghi-xxfffDTT1LWxgAm37111', 'demoAcc4', '',0, 1627955736511),
-('9','I think so. -demoAcc5', '7', 'Can I set a brainliest answer?', 'english', '123dxxghi-xxfffDTT1LW22Am17111', 'demoAcc5', '',0, 1627955736522),
-('10','Yes. Tell me if it worked. -demoAcc6', '7', 'Can I set a brainliest answer?', 'english', 'xyzdxxghi-xxf44DTT1LWCgAm37111', 'demoAcc6', '',0, 1627955736529);
-
+CREATE INDEX idx_questionId_isBrainliest_date ON `answers` (`questionId`, `isBrainliest`,`date`);
+CREATE INDEX idx_userId_date ON `answers` (`userId`, `date`);
 
 -- GETING AN ANSWER BY QUESTION ID
 
@@ -405,7 +322,6 @@ BEGIN
         `answers`.`username`,
         `answers`.`profilePicture`,
         `answers`.`date`,
-        `answers`.`lastEdited`,
         `answers`.`isBrainliest`,
         (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr,
         CASE WHEN EXISTS(
@@ -495,6 +411,17 @@ BEGIN
     DELETE FROM `answers` WHERE `questionId` = `p_questionId`;
 END;
 
+
+-- UPDATING THE QUESTION IN ANSWERS TABLE PROCEDURE
+DROP PROCEDURE IF EXISTS `update_answers_question`;
+CREATE PROCEDURE `update_answers_question` (
+    IN `p_questionId` VARCHAR(30),
+    IN `p_question` VARCHAR(1000)
+)
+BEGIN
+    UPDATE `answers` SET `question` = `p_question` WHERE `questionId` = `p_questionId`;
+END;
+
 -- UPDATING ANSWER ISBRAINLIEST PROCEDURE
 DROP PROCEDURE IF EXISTS `update_answer_brainliest`;
 CREATE PROCEDURE `update_answer_brainliest` (
@@ -534,25 +461,9 @@ CREATE TABLE `comments` (
     PRIMARY KEY (`commentId`)
 );
 
--- INITIAL ENTRIES OF COMMENTS TABLE
-
-INSERT INTO `comments` (
-    `commentId`,
-    `comment`,
-    `userId`,
-    `username`,
-    `profilePicture`,
-    `questionId`,
-    `answerId`,
-    `parent`,
-    `date`
-)
-VALUES 
-('1', 'Can you elaborate?', '2', 'lababa11', '/sample2.jpg','1', null, 'question', 1626251966085),
-('2', 'I dont understand the question.', '1', 'merck123', '/sample1.jpg', '1', null, 'question', 1626251966099),
-('3', 'Nice answer!', '1', 'merck123', '/sample1.jpg','1', '1', 'answer', 1626251966120),
-('4', 'Nice answer!', '1', 'merck123','/sample1.jpg', '1', '1', 'answer', 1626251966320),
-('5', 'Nice answer!', '1', 'merck123','/sample1.jpg', '1', '1', 'answer', 1626251966620);
+CREATE INDEX idx_questionId_parent_date ON `comments` (`questionId`, `parent`,`date`);
+CREATE INDEX idx_answerId_parent_date ON `comments` (`answerId`, `parent`,`date`);
+CREATE INDEX idx_userId ON `comments` (`userId`);
 
 -- GETTING A SINGLE COMMENT PROCEDURE
 DROP PROCEDURE IF EXISTS `get_comment_by_comment_id`;
@@ -666,22 +577,8 @@ CREATE TABLE `thanks` (
     PRIMARY KEY (`thankId`)
 );
 
--- INITIAL ENTRIES OF THANKS TABLE
-
-INSERT INTO `thanks` (
-    `thankId`,
-    `thankerId`,
-    `thankerUsername`,
-    `thankerProfilePicture`,
-    `questionId`,
-    `answerId`,
-    `answerUserId`
-)
-VALUES 
-('1', '1', 'merck123', '/sample1.jpg', '1', '1', '2'),
-('2', '4', 'nani0101', '/sample4.jpg', '1', '1', '2'),
-('3', '3', 'lyzer0101', '/sample3.jpg', '1', '1', '2'),
-('4', 'MrQVCRZmc-OvMhADTT1LWCgAm371fD', 'demoAcc1', '', '1', '1', '2');
+CREATE INDEX idx_thankerId_answerId ON `thanks` (`thankerId`, `answerId`);
+CREATE INDEX idx_answerId ON `thanks` (`answerId`);
 
 -- GETTING A THANK RECORD FOR CHECKING IF USER ALREADY THANKED THE SAME ANSWER PROCEDURE
 DROP PROCEDURE IF EXISTS `get_thank_by_thanker_id_and_answer_user_id`;

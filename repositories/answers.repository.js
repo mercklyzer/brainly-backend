@@ -8,6 +8,10 @@ const knex = require('knex')({
     }
 });
 
+const Redis = require('ioredis')
+const redis = new Redis({host: 'redis'})
+
+
 const repository = {
     // gets an answer by answerId
     getAnswerByAnswerId : (answerId) => {
@@ -86,7 +90,10 @@ const repository = {
                 // returned contains[0][0] is a list of answers
                 fulfill(returned[0][0])
             })
-            .catch((e) => reject(e))
+            .catch((e) => {
+                console.log(e);
+                reject({message: 'Error getting the answers for this question.', code: 500})
+            })
         })
     },
 
@@ -155,6 +162,14 @@ const repository = {
         const profilePicture = updatedUser.newProfilePicture
 
         return knex.raw('CALL update_user_answers(?,?,?)', [userId, username, profilePicture])
+    },
+
+    updateAnswersQuestion : (questionId, question) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL update_answers_question(?,?)', [questionId, question])
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error updating the question in answers table', code: 500}))
+        })
     }
 }
 

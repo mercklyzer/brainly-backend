@@ -10,7 +10,7 @@ const send = require('./send')
 
 const answerController = {
     getAnswersByQuestionId : (req,res) => {
-        console.log(req.user.userId);
+
         questionsRepository.getQuestionByQuestionId(req.params.id)
         .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId))
         .then((answers) => {
@@ -31,13 +31,9 @@ const answerController = {
             questionsRepository.getQuestionByQuestionId(req.params.id)
             .then((question) => {
                 questionObj = question
+                const isUserAnswered = questionObj.answers.includes(req.user.userId) || questionObj.askerId === req.user.userId
                 
-                return answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId)
-            })
-            .then((answers) => {
-                return new Promise((fulfill, reject) => {
-                    // check if user owns the question or already answered the question
-                    const isUserAnswered = answers.map((answer) => answer.userId).includes(req.user.userId) || questionObj.askerId === req.user.userId
+                return new Promise((fulfill,reject) => {
                     if(isUserAnswered){
                         reject({message: 'Either user owns the question or user already answered this question.', code: 409})
                     }
@@ -49,7 +45,10 @@ const answerController = {
             .then(() => usersRepository.getUserByUserId(req.user.userId))
             .then((user) => {
                 userObj = user
-                return usersRepository.updateCurrentPoints(userObj.userId, userObj.currentPoints + questionObj.rewardPoints)
+                const updateCurrentPoints = usersRepository.updateCurrentPoints(userObj.userId, Number(userObj.currentPoints) + Number(questionObj.rewardPoints))
+                const incrementAnswersCtr = usersRepository.incrementAnswersCtr(userObj.userId)
+                const updateQuestionAnswers = questionsRepository.updateQuestionAnswers(req.params.id, userObj.userId)
+                return Promise.all([updateCurrentPoints, incrementAnswersCtr, updateQuestionAnswers])
             })
             .then(() => {           
                 answer = {
@@ -159,16 +158,13 @@ const answerController = {
     },
 
     setBrainliest : (req, res) => {
-        const questionId = req.params.id
-        const answerId = req.params.answerId
-
         let questionObj
         let answerObj
 
-        questionsRepository.getQuestionByQuestionId(questionId)
+        questionsRepository.getQuestionByQuestionId(req.params.id)
         .then((question) => {
             questionObj = question
-            return answersRepository.getAnswerByAnswerId(answerId)
+            return answersRepository.getAnswerByAnswerId(req.params.answerId)
         })
 
         .then((answer) => {
@@ -206,8 +202,9 @@ const answerController = {
         })
         .then(() => {
             Promise.all([
-                questionsRepository.updateUserBrainliest(questionId, answerObj.userId), 
-                answersRepository.updateIsBrainliest(answerId)
+                questionsRepository.updateHasBrainliest(req.params.id), 
+                answersRepository.updateIsBrainliest(req.params.answerId),
+                usersRepository.incrementBrainliestCtr(answerObj.userId)
             ])
             .then(() => send.sendData(res,200,"Question has just set its brainliest answer."))
             .catch((e) => send.sendError(res,e.code,e.message))
@@ -251,6 +248,9 @@ const answerController = {
                 })
                 .catch(() => fulfill())
             })
+        })
+        .then(() => {
+            usersRepository.incrementThanksCtr(answerObj.userId)
         })
         .then(() => {
             thankObj = {

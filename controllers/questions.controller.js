@@ -41,7 +41,10 @@ const questionController = {
             })
             .then(() => questionsRepository.addQuestion(req.body.data))
             .then(() => send.sendData(res,201,req.body.data))
-            .catch((e) => send.sendError(res,404,e.message))
+            .catch((e) => {
+                console.log(e)
+                send.sendError(res,404,e.message)
+            })
             }
 
         
@@ -53,17 +56,12 @@ const questionController = {
 
         questionsRepository.getQuestionByQuestionId(req.params.id)
         .then((question) => {
+            question.date = parseInt(question.date)
+            question.answersCtr = question.answers.split(',').length - 1
+            question.isUserAnswered = question.answers.includes(req.user.userId) 
+            delete question.answers
             questionObj = question 
 
-            return answersRepository.getAnswerByQuestionIdAndUserId(req.params.id, req.user.userId)
-        })
-        .then((answers) => {
-            if(answers.length > 0){
-                questionObj.isUserAnswered = true
-            }
-            else{
-                questionObj.isUserAnswered = false
-            }
             send.sendData(res,200,questionObj)
         })
         .catch((e) => send.sendError(res,e.code,e.message))
@@ -83,11 +81,12 @@ const questionController = {
 
             questionsRepository.getQuestionByQuestionId(req.params.id)
             .then(question => {
-                // need to update question in answers table and comments table ########################## IMPORTANT
                 return new Promise((fulfill, reject) => {
-                    if(req.user.userId === question.askerId){
-                        // update here <----------------------------
-                        fulfill(questionsRepository.editQuestion(newQuestion))
+                    if(req.user.userId === question.askerId){                       
+                        fulfill(Promise.all([
+                            answersRepository.updateAnswersQuestion(req.params.id, newQuestion.newQuestion),
+                            questionsRepository.editQuestion(newQuestion)
+                        ]))
                     }
                     else{
                         reject({message: 'User does not own the question.', code: 401})
@@ -111,8 +110,8 @@ const questionController = {
             if(questionObj.askerId === req.user.userId){
                 console.log("check if owner");
                 return Promise.all([
-                    answersRepository.deleteAnswersByQuestionId(questionId),
-                    thanksRepository.deleteThanksByQuestionId(questionId),
+                    // answersRepository.deleteAnswersByQuestionId(questionId),
+                    // thanksRepository.deleteThanksByQuestionId(questionId),
                     commentsRepository.deleteCommentsByQuestionId(questionId),
                     questionsRepository.deleteQuestion(questionId)
                 ])

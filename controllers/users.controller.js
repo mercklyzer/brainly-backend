@@ -41,14 +41,25 @@ const userController = {
             .then(() => {
                 req.body.data = {
                     userId : nanoid(30),
+                    currentPoints: 90,
+                    thanksCtr: 0,
+                    answersCtr: 0,
+                    brainliestCtr: 0,
                     ...req.body.data,
                     password: bcrypt.hashSync(req.body.data.password, bcrypt.genSaltSync(10))
                 }
                 return usersRepository.addUser(req.body.data)
             })
-            .then((user) => {               
-                const token = jwt.issueJWT(user)
-                send.sendData(res,200, {user: user, token: token})
+            .then(() => { 
+                const cookieUser = {
+                    userId: req.body.data.userId,
+                    username: req.body.data.username,
+                    profilePicture: req.body.data.profilePicture,
+                    currentPoints: req.body.data.currentPoints
+                }
+                console.log(cookieUser);
+                const token = jwt.issueJWT(cookieUser)
+                send.sendData(res,200, {user: cookieUser, token: token})
             })
             .catch((e) => {
                 send.sendError(res,e.code,e.message)
@@ -140,6 +151,7 @@ const userController = {
             usersRepository.getUserByUsernameOrEmail(req.body.data.usernameOrEmail)
             .then((user) => {
                 if(bcrypt.compareSync(req.body.data.password, user.password )){
+                    delete user.password
                     const token = jwt.issueJWT(user)
                     send.sendData(res,200, {user: user, token: token})
                 }

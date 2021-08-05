@@ -8,17 +8,46 @@ const knex = require('knex')({
     }
 })
 
+const Redis = require('ioredis')
+const redis = new Redis({host: 'redis'})
+
 const repository = {
     // adds a user to the users object
     addUser: (newUser) => {
-        return new Promise((fulfill, reject) => {
+        const userMysql = new Promise((fulfill, reject) => {
             knex.raw(
-                'CALL add_user(?,?,?,?,?,?,?)', 
-                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.birthday, newUser.level]
+                'CALL add_user(?,?,?,?,?,?)', 
+                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints]
             )
-            .then((returned) => fulfill(returned[0][0][0]))
-            .catch(() => reject({message: 'Cannot add user.', code: 500}))
+            .then(() => fulfill())
+            .catch((e) => {
+                console.log(e);
+                reject({message: 'Cannot add user in mysql.', code: 500})
+            })
         })    
+        
+        const userObj = {
+            userId: newUser.userId,
+            username: newUser.username,
+            profilePicture: newUser.profilePicture,
+            currentPoints: newUser.currentPoints,
+            level: newUser.level,
+            birthday: newUser.birthday,
+            thanksCtr: newUser.thanksCtr,
+            answersCtr: newUser.answersCtr,
+            brainliestCtr: newUser.brainliestCtr
+        }
+
+        const userRedis = new Promise((fulfill,reject) => {
+            redis.hmset(`users:${newUser.userId}`, userObj)
+            .then((res) => {
+                console.log(res);
+                fulfill(res)
+            })
+            .catch(() => reject({message: 'Cannot add user in redis', code: 500}))
+        })
+
+        return Promise.all([userMysql, userRedis]).then((res) => console.log(res))
     },
 
     editUser : (userId, updatedUser) => {
@@ -43,14 +72,13 @@ const repository = {
     // GETS the user based on userId
     getUserByUserId: (userId) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_user_by_user_id(?)', [userId])
-            .then((returned) => {
-                if(returned[0][0].length > 0){
-                    console.log(returned[0][0][0]);
-                    fulfill(returned[0][0][0])
+            redis.hgetall(`users:${userId}`)
+            .then((res) => {
+                if(JSON.stringify(res) === '{}'){
+                    reject({message: 'User does not exist.', code: 404})
                 }
                 else{
-                    reject({message: 'User does not exist.', code: 404})
+                    fulfill(res)
                 }
             })
             .catch(() => reject({message: 'Error getting the user', code: 500}))
@@ -76,6 +104,7 @@ const repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL get_user_by_email(?)', [email])
             .then((returned) => {
+                console.log(returned[0][0][0]);
                 if(returned[0][0].length > 0){
                     fulfill(returned[0][0][0])
                 }
@@ -102,10 +131,67 @@ const repository = {
     },
 
     updateCurrentPoints : (userId, points) => {
-        return new Promise((fulfill, reject) => {
+        const userMysql = new Promise((fulfill,reject) => {
             knex.raw('CALL update_user_current_points(?,?)', [userId, points])
             .then(() => fulfill())
-            .catch(() => reject({message:'Error updating the user.', code: 500}))
+            .catch((e) => reject({message: 'Error updating user\'s current points in mysql.', code: 500}))
+        })
+
+        const updatedFields = {
+            currentPoints: points
+        }
+
+        const userRedis =  new Promise((fulfill, reject) => {
+            redis.hmset(`users:${userId}`, updatedFields)
+            .then(() => fulfill())
+            .catch((e) => {
+                console.log(e);
+                reject({message:'Error updating the user in redis.', code: 500})
+            })
+        })
+
+        return Promise.all([userMysql, userRedis])
+    },
+
+    incrementAnswersCtr : (userId) => {
+        return new Promise((fulfill, reject) => {
+            console.log("here here");
+            redis.hincrby(`users:${userId}`, 'answersCtr', 1)
+            .then(() => {
+                fulfill()
+            })
+            .catch((e) => {
+                console.log("rawr");
+                reject({message: 'Error updating user\'s answersCtr in redis.', code: 500})
+            })
+        })
+    },
+
+    incrementBrainliestCtr : (userId) => {
+        console.log(userId);
+        return new Promise((fulfill, reject) => {
+            console.log("here here");
+            redis.hincrby(`users:${userId}`, 'brainliestCtr', 1)
+            .then((res) => {
+                console.log(res);
+                fulfill()
+            })
+            .catch((e) => {
+                console.log("rawr");
+                reject({message: 'Error updating user\'s brainliestCtr in redis.', code: 500})
+            })
+        })
+    },
+
+    incrementThanksCtr : (userId) => {
+        return new Promise((fulfill, reject) => {
+            redis.hincrby(`users:${userId}`, 'thanksCtr', 1)
+            .then((res) => {
+                fulfill()
+            })
+            .catch((e) => {
+                reject({message: 'Error updating user\'s thanksCtr in redis.', code: 500})
+            })
         })
     }
 }
