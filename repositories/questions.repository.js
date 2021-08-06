@@ -80,7 +80,7 @@ let repository = {
                     reject({message: "Question does not exist.", code: 404})
                 }
                 else{
-
+                    console.log(typeof question);
                     fulfill(question)
                 }
             })

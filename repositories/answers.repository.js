@@ -170,6 +170,14 @@ const repository = {
             .then(() => fulfill())
             .catch(() => reject({message: 'Error updating the question in answers table', code: 500}))
         })
+    },
+
+    incerementThanksCtr : (answerId) => {
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL increment_answer_thanksCtr(?)', [answerId])
+            .then(() => fulfill())
+            .catch(() => reject({message: 'Error updating answer\'s thanksCtr in mysql', code: 500}))
+        })
     }
 }
 

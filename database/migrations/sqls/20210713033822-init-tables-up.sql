@@ -144,7 +144,7 @@ CREATE TABLE `questions` (
 );
 
 CREATE INDEX idx_date ON `questions` (`date`);
-CREATE INDEX idx_subject ON `questions` (`subject`);
+CREATE INDEX idx_subject_date ON `questions` (`subject`, `date`);
 CREATE INDEX idx_askerId_date ON `questions` (`askerId`, `date`);
 
 -- GETTING ALL QUESTIONS PROCEDURE
@@ -293,11 +293,12 @@ CREATE TABLE `answers` (
     `profilePicture` VARCHAR(110) DEFAULT '',
     `date` BIGINT(20) NOT NULL,
     `isBrainliest` BOOLEAN DEFAULT false,
+    `thanksCtr` INT DEFAULT 0,
 
     PRIMARY KEY (`answerId`)
 );
 
-CREATE INDEX idx_questionId_isBrainliest_date ON `answers` (`questionId`, `isBrainliest`,`date`);
+CREATE INDEX idx_questionId_isBrainliest_thanksCtr_date ON `answers` (`questionId`, `isBrainliest`,`thanksCtr`,`date`);
 CREATE INDEX idx_userId_date ON `answers` (`userId`, `date`);
 
 -- GETING AN ANSWER BY QUESTION ID
@@ -323,9 +324,9 @@ BEGIN
         `answers`.`profilePicture`,
         `answers`.`date`,
         `answers`.`isBrainliest`,
-        (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr,
+        `answers`.`thanksCtr`,
         CASE WHEN EXISTS(
-			SELECT * FROM thanks WHERE thankerId = p_userId AND thanks.answerId = answers.answerId
+			SELECT * FROM thanks WHERE thankerId = p_userId AND thanks.answerId = answers.answerId LIMIT 1
         ) THEN 1 ELSE 0 END AS isUserThanked
     FROM `answers`
     WHERE `answers`.`questionId` = `p_questionId`
@@ -347,7 +348,7 @@ BEGIN
         `answers`.`profilePicture`,
         `answers`.`date`,
         `answers`.`isBrainliest`,
-        (SELECT COUNT(*) FROM thanks WHERE thanks.answerId = answers.answerId) AS thanksCtr
+        `answers`.`thanksCtr`
     FROM `answers`
     WHERE `answers`.`userId` = `p_userId`
     ORDER BY `date` DESC;
@@ -411,8 +412,16 @@ BEGIN
     DELETE FROM `answers` WHERE `questionId` = `p_questionId`;
 END;
 
+-- INCREMENETING ANSWER'S THANKSCTR PROCEDURE
+DROP PROCEDURE IF EXISTS `increment_answer_thanksCtr`;
+CREATE PROCEDURE `increment_answer_thanksCtr` (
+    IN `p_answerId` VARCHAR(30)
+)
+BEGIN
+    UPDATE `answers` SET thanksCtr = thanksCtr+1 WHERE `answerId` = `p_answerId`;
+END;
 
--- UPDATING THE QUESTION IN ANSWERS TABLE PROCEDURE
+-- UPDATING THE QUESTION IN ANSWERS TABLE PROCEDU RE
 DROP PROCEDURE IF EXISTS `update_answers_question`;
 CREATE PROCEDURE `update_answers_question` (
     IN `p_questionId` VARCHAR(30),
@@ -626,3 +635,49 @@ CREATE PROCEDURE `update_user_thanks` (
 BEGIN
     UPDATE `thanks` SET `thankerUsername` = `p_username`, `thankerProfilePicture` = `p_profilePicture` WHERE `thankerId` = `p_userId`;
 END;
+
+
+
+
+
+
+-- ----------------------------------- POPULATING THE DATABASE WITH 1 million records on each table ---------------
+
+-- DROP PROCEDURE IF EXISTS loop_insert_user;
+-- CREATE PROCEDURE loop_insert_user()
+-- BEGIN
+--     DECLARE i INT DEFAULT 1;
+-- 	WHILE (i <= 1000000) DO
+-- 		INSERT INTO `users` (userId, username, email, password, profilePicture, currentPoints) 
+--         VALUES (CONVERT(i, CHAR(30)), CONCAT('users', CONVERT(i, CHAR(25))), CONCAT('users@a.com', CONVERT(i, CHAR(19))), 'password', '', 90);
+-- 		SET i = i+1;
+-- 	END WHILE;
+-- END;
+
+-- CALL loop_insert_user();
+
+-- DROP PROCEDURE IF EXISTS loop_insert_question;
+-- CREATE PROCEDURE loop_insert_question()
+-- BEGIN
+--     DECLARE i INT DEFAULT 1;
+-- 	WHILE (i <= 1000000) DO
+-- 		INSERT INTO `questions` (questionId, question, subject, date, lastEdited, rewardPoints, askerId, username, profilePicture, hasBrainliest) 
+--         VALUES (CONVERT(i, CHAR(30)), 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0);
+-- 		SET i = i+1;
+-- 	END WHILE;
+-- END;
+
+-- CALL loop_insert_question();
+
+-- DROP PROCEDURE IF EXISTS loop_insert_answer;
+-- CREATE PROCEDURE loop_insert_answer()
+-- BEGIN
+--     DECLARE i INT DEFAULT 1;
+-- 	WHILE (i <= 1000000) DO
+-- 		INSERT INTO `answers` (answerId, answer, questionId, question, subject, userId, username, profilePicture, date, isBrainliest) 
+--         VALUES (CONVERT(i, CHAR(30)), 'Just a dummy answer.', '1', 'Just a dummy question.', 'english', '1','users1', '', 1628222352000, 0);
+-- 		SET i = i+1;
+-- 	END WHILE;
+-- END;
+
+-- CALL loop_insert_answer();

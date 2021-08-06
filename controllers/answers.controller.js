@@ -250,7 +250,11 @@ const answerController = {
             })
         })
         .then(() => {
-            usersRepository.incrementThanksCtr(answerObj.userId)
+            
+            return Promise.all[
+                usersRepository.incrementThanksCtr(answerObj.userId),
+                answersRepository.incerementThanksCtr(answerObj.answerId)
+            ]
         })
         .then(() => {
             thankObj = {
