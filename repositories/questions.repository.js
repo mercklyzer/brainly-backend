@@ -13,9 +13,9 @@ const redis = new Redis({host: 'redis'})
 
 let repository = {
     // GETS ALL QUESTIONS
-    getAllQuestions: () => {
+    getAllQuestions: (offset) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_all_questions()')
+            knex.raw('CALL get_all_questions(?)', [offset])
             .then((returned) => {
                 // returns an array of questions
                 fulfill(returned[0][0])
@@ -25,9 +25,9 @@ let repository = {
     },
 
     // GET ALL QUESTIONS THAT MATCH THE SUBJECT
-    getQuestionsBySubject: (subject) => {
+    getQuestionsBySubject: (subject, offset) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_questions_by_subject(?)', [subject])
+            knex.raw('CALL get_questions_by_subject(?,?)', [subject, offset])
             .then((returned) => {
                 // returns an array of questions
                 fulfill(returned[0][0])
@@ -128,9 +128,9 @@ let repository = {
     },
 
     // GET all QUESTIONS of a specific user
-    getQuestionsByUser : (userId) => {
+    getQuestionsByUser : (userId, offset) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_questions_by_user_id(?)', [userId])
+            knex.raw('CALL get_questions_by_user_id(?,?)', [userId, offset])
             .then((returned) => fulfill(returned[0][0]))
             .catch(() => reject({message: 'Error getting the questions of the user.', code: 500}))
         })

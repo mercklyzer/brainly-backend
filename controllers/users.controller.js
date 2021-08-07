@@ -167,7 +167,7 @@ const userController = {
         
     getAnswersByUser : (req, res) => {
         usersRepository.getUserByUserId(req.params.id)
-        .then(() => answersRepository.getAnswersByUser(req.params.id))
+        .then(() => answersRepository.getAnswersByUser(req.params.id, Number(req.query.offset)))
         .then((answers) => send.sendData(res,200, answers))
         .catch((e) => send.sendError(res,e.code,e.message))
     },
@@ -175,7 +175,7 @@ const userController = {
     getQuestionsByUser : (req, res) => {
 
         usersRepository.getUserByUserId(req.params.id)
-        .then(() => questionsRepository.getQuestionsByUser(req.params.id))
+        .then(() => questionsRepository.getQuestionsByUser(req.params.id,  Number(req.query.offset)))
         .then((questions) => send.sendData(res,200, questions))
         .catch((e) => send.sendError(res,e.code,e.message))
     }

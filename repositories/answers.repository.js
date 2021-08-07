@@ -82,9 +82,9 @@ const repository = {
     },
 
     // GET all answers of a specific questionId
-    getAnswersByQuestionId : (questionId, userId) => {
+    getAnswersByQuestionId : (questionId, userId, offset) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_answers_by_question_id(?,?)', [questionId, userId])
+            knex.raw('CALL get_answers_by_question_id(?,?,?)', [questionId, userId, offset])
             .then((returned) => {
                 console.log(returned);
                 // returned contains[0][0] is a list of answers
@@ -98,9 +98,9 @@ const repository = {
     },
 
     // GET all answers of a specific user
-    getAnswersByUser : (userId) => {
+    getAnswersByUser : (userId, offset) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_answers_by_user_id(?)', [userId])
+            knex.raw('CALL get_answers_by_user_id(?,?)', [userId, offset])
             .then((returned) => {
                 fulfill(returned[0][0])
             })

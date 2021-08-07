@@ -9,7 +9,7 @@ const send = require('./send')
 
 const questionController = {
     displayAllQuestions: (req, res) => {
-        questionsRepository.getAllQuestions()
+        questionsRepository.getAllQuestions(Number(req.query.offset))
         .then((questions) => send.sendData(res,200,questions))
         .catch((e) => send.sendError(res,400,e.message))
     },
@@ -128,7 +128,7 @@ const questionController = {
     },
 
     getQuestionsBySubject : (req,res) => {
-        questionsRepository.getQuestionsBySubject(req.params.subject)
+        questionsRepository.getQuestionsBySubject(req.params.subject, Number(req.query.offset))
         .then((questions) => send.sendData(res,200,questions))
         .catch((e) => send.sendError(res,e.code, e.message))
     },

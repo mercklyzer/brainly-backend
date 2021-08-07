@@ -12,7 +12,7 @@ const answerController = {
     getAnswersByQuestionId : (req,res) => {
 
         questionsRepository.getQuestionByQuestionId(req.params.id)
-        .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId))
+        .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId, Number(req.query.offset)))
         .then((answers) => {
             send.sendData(res,200,answers)
         })

@@ -30,10 +30,10 @@ const repository = {
     },
 
     // get_comments_by_question_id only returns parent = "question"
-    getCommentsByQuestionId : (questionId) => {
+    getCommentsByQuestionId : (questionId, offset) => {
         return new Promise((fulfill, reject) => {
         
-            knex.raw('CALL get_comments_by_question_id(?)', [questionId])
+            knex.raw('CALL get_comments_by_question_id(?,?)', [questionId, offset])
             .then((returned) => {
                     // returns an array of comments
                     fulfill(returned[0][0])
@@ -47,17 +47,17 @@ const repository = {
     },
 
     // get_comments_by_answer_id only returns parent = "answer" (which is default since answerId = null when parent = "question")
-    getCommentsByAnswerId : (answerId) => {
+    getCommentsByAnswerId : (answerId,offset) => {
         return new Promise((fulfill, reject) => {
             console.log("getting comments");
-            knex.raw('CALL get_comments_by_answer_id(?)', [answerId])
+            knex.raw('CALL get_comments_by_answer_id(?,?)', [answerId,offset])
             .then((returned) => {
                     // returns an array of comments
                     fulfill(returned[0][0])
             })
             .catch((e) => {
                 console.log(e);
-                reject(new Error('Cannot get comments.'))
+                reject({message: 'Cannot get comments in mysql.',code:500})
             })
  
         })

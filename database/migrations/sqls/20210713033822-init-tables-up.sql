@@ -149,7 +149,9 @@ CREATE INDEX idx_askerId_date ON `questions` (`askerId`, `date`);
 
 -- GETTING ALL QUESTIONS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_all_questions`;
-CREATE PROCEDURE `get_all_questions` ()
+CREATE PROCEDURE `get_all_questions` (
+    IN `p_offset` INT
+)
 BEGIN
     SELECT 
         `questions`.`questionId`,
@@ -161,15 +163,19 @@ BEGIN
         `questions`.`rewardPoints`
     FROM
         `questions`
-    ORDER BY `date` DESC;
+    ORDER BY `date` DESC
+    LIMIT 5
+    OFFSET `p_offset`;
 END;
 
 -- GETTING QUESTIONS BY SUBJECT PROCEDURE
 DROP PROCEDURE IF EXISTS `get_questions_by_subject`;
-CREATE PROCEDURE `get_questions_by_subject` (IN `p_subject` VARCHAR(30))
+CREATE PROCEDURE `get_questions_by_subject` (IN `p_subject` VARCHAR(30), IN `p_offset` INT)
 BEGIN
     SELECT * FROM `questions` where `subject` = `p_subject`
-    ORDER BY `date` DESC;
+    ORDER BY `date` DESC
+    LIMIT 5
+    OFFSET `p_offset`;
 END;
 
 -- GETTING A QUESTION BY QUESTION ID PROCEDURE
@@ -203,7 +209,7 @@ END;
 
 -- GETTING QUESTIONS BY USER ID
 DROP PROCEDURE IF EXISTS `get_questions_by_user_id`;
-CREATE PROCEDURE `get_questions_by_user_id` ( IN `p_userId` VARCHAR(30))
+CREATE PROCEDURE `get_questions_by_user_id` ( IN `p_userId` VARCHAR(30), IN `p_offset` INT)
 BEGIN
 	SELECT 
 		`questions`.`askerId`,
@@ -217,7 +223,8 @@ BEGIN
 	FROM
 		`questions`
 	WHERE `questions`.`askerId` = `p_userId`
-    ORDER BY questions.date DESC;
+    ORDER BY questions.date DESC
+    LIMIT 5 OFFSET `p_offset`;
 END;
 
 -- ADDING A QUESTION PROCEDURE
@@ -311,7 +318,7 @@ END;
 
 -- GETTING ANSWERS BY QUESTION ID
 DROP PROCEDURE IF EXISTS `get_answers_by_question_id`;
-CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30), IN `p_userId` VARCHAR(30))
+CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30), IN `p_userId` VARCHAR(30), IN `p_offset` INT)
 BEGIN
     SELECT 
         `answers`.`answerId`,
@@ -330,12 +337,13 @@ BEGIN
         ) THEN 1 ELSE 0 END AS isUserThanked
     FROM `answers`
     WHERE `answers`.`questionId` = `p_questionId`
-    ORDER BY `answers`.`isBrainliest` DESC, `thanksCtr` DESC, `date` DESC;
+    ORDER BY `answers`.`isBrainliest` DESC, `thanksCtr` DESC, `date` DESC
+    LIMIT 5 OFFSET `p_offset`;
 END;
 
 -- GETTING ANSWERS BY USER ID
 DROP PROCEDURE IF EXISTS `get_answers_by_user_id`;
-CREATE PROCEDURE `get_answers_by_user_id` ( IN `p_userId` VARCHAR(30))
+CREATE PROCEDURE `get_answers_by_user_id` ( IN `p_userId` VARCHAR(30), IN `p_offset` INT)
 BEGIN
     SELECT 
         `answers`.`answerId`,
@@ -351,7 +359,8 @@ BEGIN
         `answers`.`thanksCtr`
     FROM `answers`
     WHERE `answers`.`userId` = `p_userId`
-    ORDER BY `date` DESC;
+    ORDER BY `date` DESC
+    LIMIT 5 OFFSET `p_offset`;
 END;
 
 -- GETTING ANSWER BY QUESTION ID AND USER ID (used to check if user already answered this question)
@@ -486,21 +495,25 @@ END;
 -- GETTING ALL COMMENTS BY QUESTION ID PROCEDURE
 DROP PROCEDURE IF EXISTS `get_comments_by_question_id`;
 CREATE PROCEDURE `get_comments_by_question_id` (
-    IN `p_questionId` VARCHAR(30)
+    IN `p_questionId` VARCHAR(30),
+    IN `p_offset` INT
 )
 BEGIN
     SELECT * FROM `comments` WHERE `questionId` = `p_questionId` AND `parent` = "question"
-    ORDER BY `date` ASC;
+    ORDER BY `date` ASC
+    LIMIT 5 OFFSET `p_offset`;
 END;
 
 -- GETTING COMMENTS BY ANSWER ID PROCEDURE
 DROP PROCEDURE IF EXISTS `get_comments_by_answer_id`;
 CREATE PROCEDURE `get_comments_by_answer_id` (
-    IN `p_answerId` VARCHAR(30)
+    IN `p_answerId` VARCHAR(30),
+    IN `p_offset` INT
 )
 BEGIN
     SELECT * FROM `comments` WHERE `answerId` = `p_answerId` AND `parent` = "answer"
-    ORDER BY `date` ASC;
+    ORDER BY `date` ASC
+    LIMIT 5 OFFSET `p_offset`;
 END;
 
 -- ADDING A SINGLE COMMENT PROCEDURE
@@ -637,6 +650,68 @@ BEGIN
 END;
 
 
+-- INSERT INTO `users` (`userId`, `username`, `email`, `password`, `currentPoints`)
+-- VALUES
+-- ('SDvE1F0w8gbEz2n3IFsZQAxaSznT5L', 'redis1', 'redis1@yahoo.com', '$2a$10$8Xc3NZXIE3cVsL6uApxR/ezbw.orE7qPJUkZLGCQsG9MDZy6wqCJO', 80);
+
+INSERT INTO `questions` (questionId, question, subject, date, lastEdited, rewardPoints, askerId, username, profilePicture, hasBrainliest) 
+VALUES 
+-- ('ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9','try pagination here', 'filipino',1628254229949,1628254229949,10,'SDvE1F0w8gbEz2n3IFsZQAxaSznT5L','redis1','',0),
+('1dasdasdasdasdadadsad', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('12323232323232', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1A', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1aa', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('aa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('a1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('aaaa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('dasd1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('dasdasa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('asdasd1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1sdda', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('ss1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('aaa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1x', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1xx', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1sssssssssssss', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1aasdas', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('x1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1tt', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1t', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1234', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1rarararar', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1rarar2', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1sssssra', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1asss', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('5325 d1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1fsd fsdf', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1dsa sdf ', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1dasdssdasdsad', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1fwr', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('123', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1867', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('144', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('1gf', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('12222', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
+ ('15345', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0);
+
+
+-- INSERT INTO `answers` (answerId, answer, questionId, question, subject, userId, username, profilePicture, date, isBrainliest, thanksCtr)
+-- VALUES 
+-- ('1', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('2', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('3', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('4', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('5', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('6', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('7', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('8', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('9', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('10', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('11', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('12', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('13', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('14', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
+-- ('15', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0);
 
 
 

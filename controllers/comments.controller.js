@@ -10,13 +10,13 @@ const send = require('./send')
 const userController = {
     getCommentsByQuestionId : (req, res) => {
 
-        commentsRepository.getCommentsByQuestionId(req.params.id)
+        commentsRepository.getCommentsByQuestionId(req.params.id, Number(req.query.offset))
         .then((comments) => send.sendData(res,200,comments))
         .catch((e) => send.sendError(res,400,e.message))
     },
 
     getCommentsByAnswerId : (req, res) => {
-        commentsRepository.getCommentsByAnswerId(req.params.answerId)
+        commentsRepository.getCommentsByAnswerId(req.params.answerId, Number(req.query.offset))
         .then((comments) => send.sendData(res,200,comments))
         .catch((e) => send.sendError(res,400,e.message))
     },
