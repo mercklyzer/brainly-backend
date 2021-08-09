@@ -650,109 +650,35 @@ BEGIN
 END;
 
 
--- INSERT INTO `users` (`userId`, `username`, `email`, `password`, `currentPoints`)
--- VALUES
--- ('SDvE1F0w8gbEz2n3IFsZQAxaSznT5L', 'redis1', 'redis1@yahoo.com', '$2a$10$8Xc3NZXIE3cVsL6uApxR/ezbw.orE7qPJUkZLGCQsG9MDZy6wqCJO', 80);
+-- FOR MESSAGING
 
-INSERT INTO `questions` (questionId, question, subject, date, lastEdited, rewardPoints, askerId, username, profilePicture, hasBrainliest) 
-VALUES 
--- ('ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9','try pagination here', 'filipino',1628254229949,1628254229949,10,'SDvE1F0w8gbEz2n3IFsZQAxaSznT5L','redis1','',0),
-('1dasdasdasdasdadadsad', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('12323232323232', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1A', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1aa', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('aa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('a1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('aaaa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('dasd1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('dasdasa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('asdasd1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1sdda', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('ss1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('aaa1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1x', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1xx', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1sssssssssssss', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1aasdas', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('x1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1tt', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1t', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1234', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1rarararar', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1rarar2', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1sssssra', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1asss', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('5325 d1', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1fsd fsdf', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1dsa sdf ', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1dasdssdasdsad', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1fwr', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('123', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1867', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('144', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('1gf', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('12222', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0),
- ('15345', 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0);
+DROP TABLE IF EXISTS `threads`;
+CREATE TABLE `threads` (
+    `threadId` VARCHAR(30) NOT NULL,
+    `user1Id` VARCHAR(30) NOT NULL,
+    `user1Username` VARCHAR(16) NOT NULL,
+    `user1ProfilePicture` VARCHAR(110) DEFAULT '',
+    `user2Id` VARCHAR(30) NOT NULL,
+    `user2Username` VARCHAR(16) NOT NULL,
+    `user2ProfilePicture` VARCHAR(110) DEFAULT '',
+    `lastSender` VARCHAR(30) DEFAULT '',
+    `lastMessage` VARCHAR(1000) DEFAULT '',
+    `lastMessageDate` BIGINT(20) NOT NULL,
 
+    PRIMARY KEY(`threadId`)
+);
 
--- INSERT INTO `answers` (answerId, answer, questionId, question, subject, userId, username, profilePicture, date, isBrainliest, thanksCtr)
--- VALUES 
--- ('1', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('2', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('3', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('4', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('5', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('6', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('7', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('8', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('9', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('10', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('11', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('12', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('13', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('14', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0),
--- ('15', 'dummy answer', 'ldI2VuakBq5ZPNbkH4hjq9kUy-C4D9', 'try pagination here', 'filipino', '1', 'users1', '', 1628217289999, 0,0);
+DROP TABLE IF EXISTS `messages`;
+CREATE TABLE `messages` (
+    `messageId` VARCHAR(30) NOT NULL,
+    `message` VARCHAR(1000) NOT NULL,
+    `senderId` VARCHAR(30) NOT NULL,
+    `senderUsername` VARCHAR(16) NOT NULL,
+    `senderProfilePicture` VARCHAR(110) DEFAULT '',
+    `receiverId` VARCHAR(30) NOT NULL,
+    `receiverUsername` VARCHAR(16) NOT NULL,
+    `receiverProfilePicture` VARCHAR(110) DEFAULT '',
+    `date` BIGINT(20) NOT NULL,
 
-
-
-
--- ----------------------------------- POPULATING THE DATABASE WITH 1 million records on each table ---------------
-
--- DROP PROCEDURE IF EXISTS loop_insert_user;
--- CREATE PROCEDURE loop_insert_user()
--- BEGIN
---     DECLARE i INT DEFAULT 1;
--- 	WHILE (i <= 1000000) DO
--- 		INSERT INTO `users` (userId, username, email, password, profilePicture, currentPoints) 
---         VALUES (CONVERT(i, CHAR(30)), CONCAT('users', CONVERT(i, CHAR(25))), CONCAT('users@a.com', CONVERT(i, CHAR(19))), 'password', '', 90);
--- 		SET i = i+1;
--- 	END WHILE;
--- END;
-
--- CALL loop_insert_user();
-
--- DROP PROCEDURE IF EXISTS loop_insert_question;
--- CREATE PROCEDURE loop_insert_question()
--- BEGIN
---     DECLARE i INT DEFAULT 1;
--- 	WHILE (i <= 1000000) DO
--- 		INSERT INTO `questions` (questionId, question, subject, date, lastEdited, rewardPoints, askerId, username, profilePicture, hasBrainliest) 
---         VALUES (CONVERT(i, CHAR(30)), 'Just a dummy question.', 'english', 1628217286906, 1628217286906, 90,'dummyakserId1', 'dummyUsername', '', 0);
--- 		SET i = i+1;
--- 	END WHILE;
--- END;
-
--- CALL loop_insert_question();
-
--- DROP PROCEDURE IF EXISTS loop_insert_answer;
--- CREATE PROCEDURE loop_insert_answer()
--- BEGIN
---     DECLARE i INT DEFAULT 1;
--- 	WHILE (i <= 1000000) DO
--- 		INSERT INTO `answers` (answerId, answer, questionId, question, subject, userId, username, profilePicture, date, isBrainliest) 
---         VALUES (CONVERT(i, CHAR(30)), 'Just a dummy answer.', '1', 'Just a dummy question.', 'english', '1','users1', '', 1628222352000, 0);
--- 		SET i = i+1;
--- 	END WHILE;
--- END;
-
--- CALL loop_insert_answer();
+    PRIMARY KEY(`messageId`)
+);

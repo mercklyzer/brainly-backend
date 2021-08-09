@@ -45,7 +45,7 @@ const questionController = {
                 console.log(e)
                 send.sendError(res,404,e.message)
             })
-            }
+        }
 
         
     },
