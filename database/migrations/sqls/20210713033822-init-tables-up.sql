@@ -668,9 +668,70 @@ CREATE TABLE `threads` (
     PRIMARY KEY(`threadId`)
 );
 
+DROP PROCEDURE IF EXISTS `get_thread_by_thread_id`;
+CREATE PROCEDURE `get_thread_by_thread_id` (
+    IN `p_threadId` VARCHAR(30)
+)
+BEGIN
+    SELECT * FROM `threads` WHERE `threadId` = `p_threadId`;
+END;
+
+DROP PROCEDURE IF EXISTS `get_thread_by_user_ids`;
+CREATE PROCEDURE `get_thread_by_user_ids` (
+    IN `p_user1Id` VARCHAR(30),
+    IN `p_user2Id` VARCHAR(30)
+)
+BEGIN
+    SELECT `threadId` FROM `threads` WHERE `user1Id` = `p_user1Id` AND `user2Id` = `p_user2Id`;
+END;
+
+
+DROP PROCEDURE IF EXISTS `add_thread`;
+CREATE PROCEDURE `add_thread` (
+    IN `p_threadId` VARCHAR(30), 
+    IN `p_user1Id` VARCHAR(30), 
+    IN `p_user1Username` VARCHAR(16), 
+    IN `p_user1ProfilePicture` VARCHAR(110), 
+    IN `p_user2Id` VARCHAR(30), 
+    IN `p_user2Username` VARCHAR(16), 
+    IN `p_user2ProfilePicture` VARCHAR(110), 
+    IN `p_lastSender` VARCHAR(30), 
+    IN `p_lastMessage` VARCHAR(1000), 
+    IN `p_date` BIGINT(20)
+)
+BEGIN
+    INSERT INTO `threads` (`threadId`, `user1Id`, `user1Username`, `user1ProfilePicture`, `user2Id`, `user2Username`, `user2ProfilePicture`, `lastSender`, `lastMessage`, `lastMessageDate`)
+    VALUES (`p_threadId`, `p_user1Id`, `p_user1Username`, `p_user1ProfilePicture`, `p_user2Id`, `p_user2Username`, `p_user2ProfilePicture`, `p_lastSender`, `p_lastMessage`, `p_date`);
+END;
+
+DROP PROCEDURE IF EXISTS `get_threads_by_user_id`;
+CREATE PROCEDURE `get_threads_by_user_id` (
+    IN `p_userId` VARCHAR(30)
+)
+BEGIN
+    SELECT * FROM `threads` 
+    WHERE (`user1Id` = `p_userId` OR `user2Id` = `p_userId`) AND `lastMessage` != ''
+    ORDER BY `lastMessageDate` DESC; 
+END;
+
+DROP PROCEDURE IF EXISTS `update_thread`;
+CREATE PROCEDURE `update_thread` (
+    IN `p_threadId` VARCHAR(30),
+    IN `p_message` VARCHAR(1000),
+    IN `p_date` BIGINT
+)
+BEGIN
+    UPDATE `threads` SET `lastMessage` = `p_message`, `lastMessageDate` = `p_date`
+    WHERE `threadId` = `p_threadId`;
+END;
+
+
+
+
 DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
     `messageId` VARCHAR(30) NOT NULL,
+    `threadId` VARCHAR(30) NOT NULL,
     `message` VARCHAR(1000) NOT NULL,
     `senderId` VARCHAR(30) NOT NULL,
     `senderUsername` VARCHAR(16) NOT NULL,
@@ -682,3 +743,32 @@ CREATE TABLE `messages` (
 
     PRIMARY KEY(`messageId`)
 );
+
+
+DROP PROCEDURE IF EXISTS `get_messages_by_thread_id`;
+CREATE PROCEDURE `get_messages_by_thread_id` (
+    IN `p_threadId` VARCHAR(30)
+)
+BEGIN
+    SELECT * FROM `messages` 
+    WHERE `threadId` = `p_threadId`
+    ORDER BY `date` DESC; 
+END;
+
+DROP PROCEDURE IF EXISTS `add_message`;
+CREATE PROCEDURE `add_message` (
+    IN `p_messageId` VARCHAR(30), 
+    IN `p_threadId` VARCHAR(30), 
+    IN `p_senderId` VARCHAR(30), 
+    IN `p_senderUsername` VARCHAR(16), 
+    IN `p_senderProfilePicture` VARCHAR(110), 
+    IN `p_receiverId` VARCHAR(30), 
+    IN `p_receiverUsername` VARCHAR(16), 
+    IN `p_receiverProfilePicture` VARCHAR(110), 
+    IN `p_message` VARCHAR(1000), 
+    IN `p_date` BIGINT(20)
+)
+BEGIN
+    INSERT INTO `messages` (`messageId`, `threadId`, `senderId`, `senderUsername`, `senderProfilePicture`, `receiverId`, `receiverUsername`, `receiverProfilePicture`, `message`, `date`)
+    VALUES (`p_messageId`, `p_threadId`, `p_senderId`, `p_senderUsername`, `p_senderProfilePicture`, `p_receiverId`, `p_receiverUsername`, `p_receiverProfilePicture`, `p_message`, `p_date`);
+END;
