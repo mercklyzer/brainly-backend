@@ -48,6 +48,8 @@ const userController = {
                     ...req.body.data,
                     password: bcrypt.hashSync(req.body.data.password, bcrypt.genSaltSync(10))
                 }
+
+                req.body.data.profilePicture = req.body.data.profilePicture? `${req.body.data.userId}-${req.body.data.profilePicture}` : ''
                 return usersRepository.addUser(req.body.data)
             })
             .then(() => { 
@@ -57,7 +59,6 @@ const userController = {
                     profilePicture: req.body.data.profilePicture,
                     currentPoints: req.body.data.currentPoints
                 }
-                console.log(cookieUser);
                 const token = jwt.issueJWT(cookieUser)
                 send.sendData(res,200, {user: cookieUser, token: token})
             })

@@ -21,7 +21,6 @@ const repository = {
             )
             .then(() => fulfill())
             .catch((e) => {
-                console.log(e);
                 reject({message: 'Cannot add user in mysql.', code: 500})
             })
         })    
@@ -41,7 +40,6 @@ const repository = {
         const userRedis = new Promise((fulfill,reject) => {
             redis.hmset(`users:${newUser.userId}`, userObj)
             .then((res) => {
-                console.log(res);
                 fulfill(res)
             })
             .catch(() => reject({message: 'Cannot add user in redis', code: 500}))
@@ -104,7 +102,6 @@ const repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL get_user_by_email(?)', [email])
             .then((returned) => {
-                console.log(returned[0][0][0]);
                 if(returned[0][0].length > 0){
                     fulfill(returned[0][0][0])
                 }
@@ -145,7 +142,6 @@ const repository = {
             redis.hmset(`users:${userId}`, updatedFields)
             .then(() => fulfill())
             .catch((e) => {
-                console.log(e);
                 reject({message:'Error updating the user in redis.', code: 500})
             })
         })
@@ -155,29 +151,23 @@ const repository = {
 
     incrementAnswersCtr : (userId) => {
         return new Promise((fulfill, reject) => {
-            console.log("here here");
             redis.hincrby(`users:${userId}`, 'answersCtr', 1)
             .then(() => {
                 fulfill()
             })
             .catch((e) => {
-                console.log("rawr");
                 reject({message: 'Error updating user\'s answersCtr in redis.', code: 500})
             })
         })
     },
 
     incrementBrainliestCtr : (userId) => {
-        console.log(userId);
         return new Promise((fulfill, reject) => {
-            console.log("here here");
             redis.hincrby(`users:${userId}`, 'brainliestCtr', 1)
             .then((res) => {
-                console.log(res);
                 fulfill()
             })
             .catch((e) => {
-                console.log("rawr");
                 reject({message: 'Error updating user\'s brainliestCtr in redis.', code: 500})
             })
         })

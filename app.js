@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users');
 var questionsRouter = require('./routes/questions')
 var subjectsRouter = require('./routes/subjects')
 var threadsRouter = require('./routes/threads')
+var imagesRouter = require('./routes/images')
 
 var app = express();
 
@@ -34,7 +35,7 @@ const corsOptions = {
   }
 }
 
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -48,27 +49,7 @@ app.use('/users', usersRouter);
 app.use('/questions', questionsRouter);
 app.use('/subjects', subjectsRouter);
 app.use('/threads', threadsRouter);
-
-// const http = require('http').Server(app)
-// const io = require('socket.io')(http);
-
-// io.on('connection', socket => {
-//   console.log("a user connected");
-
-//   socket.on('join', (userId) => {
-//     socket.join(userId)
-//     console.log(`$user: {userId} joined his room`);
-//   })
-
-//   socket.on('send message', messageObj => {
-//     socket.to(messageObj.receiverId).emit('receive message', messageObj)
-//   })
-
-//   socket.on('update thread', threadObj => {
-//     socket.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
-//   })
-
-// })
+app.use('/files', imagesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
