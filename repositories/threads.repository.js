@@ -71,7 +71,6 @@ const repository = {
     },
 
     updateThread : (threadId, message, date) => {
-        console.log("update thread repo");
         return new Promise((fulfill, reject) => {
             knex.raw('CALL update_thread(?,?,?)', [threadId, message, date])
             .then(() => {
@@ -85,7 +84,6 @@ const repository = {
     },
 
     addMessage : (messageObj) => {
-        console.log("start of repository");
         return new Promise((fulfill, reject) => {
             knex.raw('CALL add_message(?,?,?,?,?,?,?,?,?,?)', [
                 messageObj.messageId,
@@ -113,7 +111,6 @@ const repository = {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL get_thread_by_thread_id(?)', [threadId])
             .then((returned) => {
-                console.log(returned);
                 if(returned[0][0].length > 0){
                     fulfill(returned[0][0][0])
                 }

@@ -12,9 +12,6 @@ const threadController = {
         let user2 = req.user.userId < req.body.data.userId ?  req.body.data : req.user 
         let threadObj
 
-        console.log(user1);
-        console.log(user2);
-
         new Promise((fulfill, reject) => {
             threadsRepository.getThreadByUserIds(user1.userId, user2.userId)
             .then((threadId) => {
@@ -69,17 +66,11 @@ const threadController = {
     },
 
     addMessage: (req, res) => {
-        console.log("start of controller");
-        console.log(req.body.data);
-        console.log("controller");
         let messageObj = {
             messageId: nanoid(30),
             ...req.body.data,
             date: new Date().getTime()
         }
-        console.log(messageObj);
-
-
 
         threadsRepository.updateThread(messageObj.threadId, messageObj.message, messageObj.date)
         .then(() => threadsRepository.addMessage(messageObj))
