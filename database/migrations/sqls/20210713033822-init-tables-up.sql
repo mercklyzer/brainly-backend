@@ -158,6 +158,7 @@ BEGIN
         `questions`.`question`,
         `questions`.`askerId`,
         `questions`.`username`,
+        `questions`.`profilePicture`,
         `questions`.`subject`,
         `questions`.`date`,
         `questions`.`rewardPoints`

@@ -3,11 +3,6 @@
 
 
 var app = require('../app');
-var debug = require('debug')('brainlydocker:server');
-
-/**
- * Get port from environment and store in Express.
- */
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
@@ -15,11 +10,16 @@ app.set('port', port);
  const http = require('http').Server(app)
  const io = require('socket.io')(http);
  
+ let questions = {}
+
  io.on('connection', socket => {
+  
    console.log('user connected');
 
-   socket.on('join', (userId) => {
-     socket.join(userId)
+  //  id can be subject, userId, questionId, answerId
+   socket.on('join user', (id) => {
+     console.log(`joining ${id}`);
+     socket.join(id)
    })
  
    socket.on('send message', messageObj => {
@@ -34,7 +34,66 @@ app.set('port', port);
    socket.on('update thread', threadObj => {
      io.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
    })
- 
+
+
+   socket.on('join question', (questionId) => {
+     socket.join(questionId)
+
+    if(!questions.hasOwnProperty(questionId)){
+      questions[questionId] = {
+        questionId: questionId,
+        watchers: []
+      }
+    }
+
+    console.log("sending watchers");
+    console.log(questionId);
+    // io.emit('receive watcher',  questions[questionId])
+    io.to(questionId).emit('receive watcher',  questions[questionId])
+  })
+
+   socket.on('watch question', (questionObj, userObj) => {
+    if(!questions[questionObj.questionId]){
+      questions[questionObj.questionId] = {
+        questionId: questionObj.questionId,
+        watchers: [userObj]
+      }
+      console.log("not yet exist");
+    }
+    else{
+      questions[questionObj.questionId].watchers = [...questions[questionObj.questionId].watchers, userObj] 
+      console.log("append");
+    }
+    
+     console.log("watching question");
+     console.log(questions[questionObj.questionId]);
+     io.to(questionObj.questionId).emit('receive watcher', questions[questionObj.questionId])
+    //  io.emit('receive watcher', questions[questionObj.questionId])
+   })
+
+   socket.on('leave question', (questionId,user) => {
+     console.log("leaving question");
+    let index = questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId)
+
+    if(index !== -1){
+      console.log("question exists")
+      questions[questionId].watchers.splice(index, 1)
+  
+      socket.leave(questionId)
+      io.to(questionId).emit(questions[questionId])
+    }
+    console.log(questions[questionId]);
+   })
+
+   socket.on('join question-answer', (questionId) => {
+    socket.join(questionId)
+   })
+
+   socket.on('typing answer', (questionId, boolVal) => {
+     io.to(questionId).emit('update typing answer', boolVal)
+   })
+
+
  })
 
 
