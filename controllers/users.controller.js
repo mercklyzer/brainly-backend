@@ -49,7 +49,10 @@ const userController = {
                     password: bcrypt.hashSync(req.body.data.password, bcrypt.genSaltSync(10))
                 }
 
-                req.body.data.profilePicture = req.body.data.profilePicture? `${req.body.data.userId}-${req.body.data.profilePicture}` : ''
+                req.body.data.profilePicture = req.body.data.profilePicture? 
+                    userController.modifyProfilePicturePath(req.body.data.userId,req.body.data.profilePicture)
+                    : 
+                    ''
                 return usersRepository.addUser(req.body.data)
             })
             .then(() => { 
@@ -66,6 +69,17 @@ const userController = {
                 send.sendError(res,e.code,e.message)
             })
         }
+    },
+
+    modifyProfilePicturePath : (userId, path) => {
+        console.log("original path: ", path);
+        let route = path.split('/')
+        let file = route.pop()
+        route.push(userId+'-'+file)
+        console.log(route);
+        let newPath = route.join('/')
+        console.log(newPath);
+        return newPath
     },
 
     addUserHasMissingField : (req) =>{

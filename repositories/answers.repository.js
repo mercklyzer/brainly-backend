@@ -1,15 +1,12 @@
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host : 'db_server',
+      host : 'brainly_db',
       user : 'root',
       password : 'password',
-      database : 'mydb'
+      database : 'brainly_db'
     }
 });
-
-const Redis = require('ioredis')
-const redis = new Redis({host: 'redis'})
 
 
 const repository = {

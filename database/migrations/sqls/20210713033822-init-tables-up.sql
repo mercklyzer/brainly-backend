@@ -292,7 +292,7 @@ END;
 DROP TABLE IF EXISTS `answers`;
 CREATE TABLE `answers` (
     `answerId` VARCHAR(30) NOT NULL,
-    `answer` VARCHAR(110) NOT NULL,
+    `answer` VARCHAR(1000) NOT NULL,
     `questionId` VARCHAR(30) NOT NULL,
     `question` VARCHAR(1000) NOT NULL,
     `subject` VARCHAR(30) NOT NULL,
@@ -378,7 +378,7 @@ END;
 DROP PROCEDURE IF EXISTS `add_answer`;
 CREATE PROCEDURE `add_answer` (
     IN `p_answerId` VARCHAR(30),
-    IN `p_answer` VARCHAR(110),
+    IN `p_answer` VARCHAR(1000),
     IN `p_questionId` VARCHAR(30),
     IN `p_question` VARCHAR(1000),
     IN `p_subject` VARCHAR(30),

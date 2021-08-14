@@ -72,8 +72,8 @@ app.set('port', port);
    })
 
    socket.on('leave question', (questionId,user) => {
-     console.log("leaving question");
-    let index = questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId)
+    console.log("leaving question");
+    let index = questions[questionId]? questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId) : -1
 
     if(index !== -1){
       console.log("question exists")
@@ -93,6 +93,19 @@ app.set('port', port);
      io.to(questionId).emit('update typing answer', boolVal)
    })
 
+   socket.on('add answer', (answerObj) => {
+     console.log("add answer");
+     console.log(answerObj.questionId);
+    io.to(answerObj.questionId).emit('new answer', answerObj)
+  })
+
+   socket.on('join subject', (subject) => {
+     socket.join(subject)
+   })
+
+   socket.on('add question', (questionObj) => {
+     io.to(questionObj.subject).to('all').emit('new question', questionObj)
+   })
 
  })
 
