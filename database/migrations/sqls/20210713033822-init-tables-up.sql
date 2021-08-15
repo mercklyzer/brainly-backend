@@ -6,7 +6,7 @@ CREATE TABLE `users` (
     `userId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(16) NOT NULL,
     `email`  VARCHAR(64) NOT NULL,
-    `profilePicture` VARCHAR(110) DEFAULT '',
+    `profilePicture` VARCHAR(500) DEFAULT '',
     `password` VARCHAR(110) NOT NULL,
     `currentPoints` INT DEFAULT 90,
 
@@ -30,7 +30,7 @@ CREATE PROCEDURE `add_user` (
     IN `p_username` VARCHAR(16),
     IN `p_password` VARCHAR(110),
     IN `p_email`  VARCHAR(64),
-    IN `p_profilePicture` VARCHAR(110),
+    IN `p_profilePicture` VARCHAR(500),
     IN `p_currentPoints` INT
 )
 BEGIN
@@ -46,7 +46,7 @@ CREATE PROCEDURE `edit_user` (
     IN `p_email`  VARCHAR(64),
     IN `p_password` VARCHAR(110),
     IN `p_level` ENUM('Junior High', 'Senior High', 'College'),
-    IN `p_profilePicture` VARCHAR(110)
+    IN `p_profilePicture` VARCHAR(500)
 )
 BEGIN
     UPDATE `users` SET `username` = `p_username`, `email` = `p_email`, `password` = `p_password`, `profilePicture` = `p_profilePicture`, `level` = `p_level` 
@@ -137,7 +137,7 @@ CREATE TABLE `questions` (
     `rewardPoints` INT NOT NULL,
     `askerId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(30) NOT NULL,
-    `profilePicture` VARCHAR(110),
+    `profilePicture` VARCHAR(500),
     `hasBrainliest` BOOLEAN DEFAULT false,
 
     PRIMARY KEY (`questionId`)
@@ -237,7 +237,7 @@ CREATE PROCEDURE `add_question` (
     IN `p_rewardPoints` INT,
     IN `p_askerId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110),
+    IN `p_profilePicture` VARCHAR(500),
     IN `p_date` BIGINT(20)
     
 )
@@ -280,7 +280,7 @@ DROP PROCEDURE IF EXISTS `update_user_questions`;
 CREATE PROCEDURE `update_user_questions` (
     IN `p_userId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110)
+    IN `p_profilePicture` VARCHAR(500)
 )
 BEGIN
     UPDATE `questions` SET `username` = `p_username`, `profilePicture` = `p_profilePicture` WHERE `askerId` = `p_userId`;
@@ -298,7 +298,7 @@ CREATE TABLE `answers` (
     `subject` VARCHAR(30) NOT NULL,
     `userId`  VARCHAR(30) NOT NULL,
     `username` VARCHAR(16) NOT NULL,
-    `profilePicture` VARCHAR(110) DEFAULT '',
+    `profilePicture` VARCHAR(500) DEFAULT '',
     `date` BIGINT(20) NOT NULL,
     `isBrainliest` BOOLEAN DEFAULT false,
     `thanksCtr` INT DEFAULT 0,
@@ -384,7 +384,7 @@ CREATE PROCEDURE `add_answer` (
     IN `p_subject` VARCHAR(30),
     IN `p_userId` VARCHAR(30),
     IN `p_userName` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110),
+    IN `p_profilePicture` VARCHAR(500),
     IN `p_date` BIGINT(20)
 )
 BEGIN
@@ -455,7 +455,7 @@ DROP PROCEDURE IF EXISTS `update_user_answers`;
 CREATE PROCEDURE `update_user_answers` (
     IN `p_userId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110)
+    IN `p_profilePicture` VARCHAR(500)
 )
 BEGIN
     UPDATE `answers` SET `username` = `p_username`, `profilePicture` = `p_profilePicture` WHERE `userId` = `p_userId`;
@@ -470,7 +470,7 @@ CREATE TABLE `comments` (
     `comment` VARCHAR(110) NOT NULL,
     `userId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(16) NOT NULL,
-    `profilePicture` VARCHAR(110),
+    `profilePicture` VARCHAR(500),
     `questionId`  VARCHAR(30) NOT NULL,
     `answerId` VARCHAR(30),
     `parent` ENUM('question', 'answer') NOT NULL,
@@ -524,7 +524,7 @@ CREATE PROCEDURE `add_comment` (
     IN `p_comment` VARCHAR(110),
     IN `p_userId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110),
+    IN `p_profilePicture` VARCHAR(500),
     IN `p_questionId` VARCHAR(30),
     IN `p_answerId` VARCHAR(30),
     IN `p_parent` ENUM('question', 'answer'),
@@ -579,7 +579,7 @@ DROP PROCEDURE IF EXISTS `update_user_comments`;
 CREATE PROCEDURE `update_user_comments` (
     IN `p_userId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110)
+    IN `p_profilePicture` VARCHAR(500)
 )
 BEGIN
     UPDATE `comments` SET `username` = `p_username`, `profilePicture` = `p_profilePicture` WHERE `userId` = `p_userId`;
@@ -592,7 +592,7 @@ CREATE TABLE `thanks` (
     `thankId` VARCHAR(30) NOT NULL,
     `thankerId` VARCHAR(30) NOT NULL,
     `thankerUsername` VARCHAR(16) NOT NULL,
-    `thankerProfilePicture` VARCHAR(110),
+    `thankerProfilePicture` VARCHAR(500),
     `questionId` VARCHAR(30) NOT NULL,
     `answerId` VARCHAR(30) NOT NULL,
     `answerUserId` VARCHAR(30) NOT NULL,
@@ -619,7 +619,7 @@ CREATE PROCEDURE `add_thank` (
     IN `p_thankId` VARCHAR(30),
     IN `p_thankerId` VARCHAR(30),
     IN `p_thankerUsername` VARCHAR(30),
-    IN `p_thankerProfilePicture` VARCHAR(110),
+    IN `p_thankerProfilePicture` VARCHAR(500),
     IN `p_questionId` VARCHAR(30),
     IN `p_answerId` VARCHAR(30),
     IN `p_answerUserId` VARCHAR(30)
@@ -644,7 +644,7 @@ DROP PROCEDURE IF EXISTS `update_user_thanks`;
 CREATE PROCEDURE `update_user_thanks` (
     IN `p_userId` VARCHAR(30),
     IN `p_username` VARCHAR(16),
-    IN `p_profilePicture` VARCHAR(110)
+    IN `p_profilePicture` VARCHAR(500)
 )
 BEGIN
     UPDATE `thanks` SET `thankerUsername` = `p_username`, `thankerProfilePicture` = `p_profilePicture` WHERE `thankerId` = `p_userId`;
@@ -658,10 +658,10 @@ CREATE TABLE `threads` (
     `threadId` VARCHAR(30) NOT NULL,
     `user1Id` VARCHAR(30) NOT NULL,
     `user1Username` VARCHAR(16) NOT NULL,
-    `user1ProfilePicture` VARCHAR(110) DEFAULT '',
+    `user1ProfilePicture` VARCHAR(500) DEFAULT '',
     `user2Id` VARCHAR(30) NOT NULL,
     `user2Username` VARCHAR(16) NOT NULL,
-    `user2ProfilePicture` VARCHAR(110) DEFAULT '',
+    `user2ProfilePicture` VARCHAR(500) DEFAULT '',
     `lastSender` VARCHAR(30) DEFAULT '',
     `lastMessage` VARCHAR(1000) DEFAULT '',
     `lastMessageDate` BIGINT(20) NOT NULL,
@@ -692,10 +692,10 @@ CREATE PROCEDURE `add_thread` (
     IN `p_threadId` VARCHAR(30), 
     IN `p_user1Id` VARCHAR(30), 
     IN `p_user1Username` VARCHAR(16), 
-    IN `p_user1ProfilePicture` VARCHAR(110), 
+    IN `p_user1ProfilePicture` VARCHAR(500), 
     IN `p_user2Id` VARCHAR(30), 
     IN `p_user2Username` VARCHAR(16), 
-    IN `p_user2ProfilePicture` VARCHAR(110), 
+    IN `p_user2ProfilePicture` VARCHAR(500), 
     IN `p_lastSender` VARCHAR(30), 
     IN `p_lastMessage` VARCHAR(1000), 
     IN `p_date` BIGINT(20)
@@ -736,10 +736,10 @@ CREATE TABLE `messages` (
     `message` VARCHAR(1000) NOT NULL,
     `senderId` VARCHAR(30) NOT NULL,
     `senderUsername` VARCHAR(16) NOT NULL,
-    `senderProfilePicture` VARCHAR(110) DEFAULT '',
+    `senderProfilePicture` VARCHAR(500) DEFAULT '',
     `receiverId` VARCHAR(30) NOT NULL,
     `receiverUsername` VARCHAR(16) NOT NULL,
-    `receiverProfilePicture` VARCHAR(110) DEFAULT '',
+    `receiverProfilePicture` VARCHAR(500) DEFAULT '',
     `date` BIGINT(20) NOT NULL,
 
     PRIMARY KEY(`messageId`)
@@ -762,10 +762,10 @@ CREATE PROCEDURE `add_message` (
     IN `p_threadId` VARCHAR(30), 
     IN `p_senderId` VARCHAR(30), 
     IN `p_senderUsername` VARCHAR(16), 
-    IN `p_senderProfilePicture` VARCHAR(110), 
+    IN `p_senderProfilePicture` VARCHAR(500), 
     IN `p_receiverId` VARCHAR(30), 
     IN `p_receiverUsername` VARCHAR(16), 
-    IN `p_receiverProfilePicture` VARCHAR(110), 
+    IN `p_receiverProfilePicture` VARCHAR(500), 
     IN `p_message` VARCHAR(1000), 
     IN `p_date` BIGINT(20)
 )

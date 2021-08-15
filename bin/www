@@ -68,7 +68,6 @@ app.set('port', port);
      console.log("watching question");
      console.log(questions[questionObj.questionId]);
      io.to(questionObj.questionId).emit('receive watcher', questions[questionObj.questionId])
-    //  io.emit('receive watcher', questions[questionObj.questionId])
    })
 
    socket.on('leave question', (questionId,user) => {
@@ -79,8 +78,9 @@ app.set('port', port);
       console.log("question exists")
       questions[questionId].watchers.splice(index, 1)
   
-      socket.leave(questionId)
-      io.to(questionId).emit(questions[questionId])
+      // socket.leave(questionId)
+      io.to(questionId).emit('receive watcher', questions[questionId])
+      console.log("sent");
     }
     console.log(questions[questionId]);
    })
