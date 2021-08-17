@@ -724,6 +724,7 @@ CREATE PROCEDURE `update_thread` (
 BEGIN
     UPDATE `threads` SET `lastMessage` = `p_message`, `lastMessageDate` = `p_date`
     WHERE `threadId` = `p_threadId`;
+    SELECT * FROM `threads` WHERE `threadId` = `p_threadId`; 
 END;
 
 

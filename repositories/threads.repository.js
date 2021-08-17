@@ -73,8 +73,8 @@ const repository = {
     updateThread : (threadId, message, date) => {
         return new Promise((fulfill, reject) => {
             knex.raw('CALL update_thread(?,?,?)', [threadId, message, date])
-            .then(() => {
-                fulfill()
+            .then((returned) => {
+                fulfill(returned[0][0][0])
             })
             .catch((e) => {
                 console.log(e);

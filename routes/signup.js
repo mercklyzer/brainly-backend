@@ -4,7 +4,6 @@ var router = express.Router();
 const userController = require('../controllers/users.controller')
 
 router.post('/',  (req, res, next) => {
-    console.log("adding user");
     userController.addUser(req,res)
 })
 

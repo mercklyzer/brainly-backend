@@ -6,66 +6,67 @@ var logger = require('morgan');
 var cors = require('cors')
 const passport = require('passport');
 
+module.exports = (socket) => {
 
-// ROUTERS
-var signupRouter = require('./routes/signup');
-var loginRouter = require('./routes/login');
-var usersRouter = require('./routes/users');
-var questionsRouter = require('./routes/questions')
-var subjectsRouter = require('./routes/subjects')
-var threadsRouter = require('./routes/threads')
-var imagesRouter = require('./routes/images')
+  // ROUTERS
+  var signupRouter = require('./routes/signup');
+  var loginRouter = require('./routes/login');
+  var usersRouter = require('./routes/users');
+  var questionsRouter = require('./routes/questions')(socket)
+  var subjectsRouter = require('./routes/subjects')
+  var threadsRouter = require('./routes/threads')(socket)
+  var imagesRouter = require('./routes/images')
 
-var app = express();
+  var app = express();
 
-require('./auth/passport')(passport);
+  require('./auth/passport')(passport);
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+  // view engine setup
+  app.set('views', path.join(__dirname, 'views'));
+  app.set('view engine', 'jade');
 
-const whitelist = ['http://localhost:4200'];
-const corsOptions = {
-  credentials: true, // This is important.
-  origin: (origin, callback) => {
-    if(whitelist.includes(origin))
-      return callback(null, true)
+  const whitelist = ['http://localhost:4200'];
+  const corsOptions = {
+    credentials: true, // This is important.
+    origin: (origin, callback) => {
+      if(whitelist.includes(origin))
+        return callback(null, true)
 
-      callback(new Error('Not allowed by CORS'));
+        callback(new Error('Not allowed by CORS'));
+    }
   }
+
+  app.use(cors());
+
+  app.use(logger('dev'));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use(cookieParser());
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  app.use('/signup', signupRouter);
+  app.use('/login', loginRouter);
+  app.use('/users', usersRouter);
+  app.use('/questions', questionsRouter);
+  app.use('/subjects', subjectsRouter);
+  app.use('/threads', threadsRouter);
+  app.use('/files', imagesRouter);
+
+  // catch 404 and forward to error handler
+  app.use(function(req, res, next) {
+    next(createError(404));
+  });
+
+  // error handler
+  app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
+  });
+
+  return app
 }
-
-app.use(cors());
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/signup', signupRouter);
-app.use('/login', loginRouter);
-app.use('/users', usersRouter);
-app.use('/questions', questionsRouter);
-app.use('/subjects', subjectsRouter);
-app.use('/threads', threadsRouter);
-app.use('/files', imagesRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-
-module.exports = app;

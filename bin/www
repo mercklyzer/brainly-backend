@@ -1,116 +1,19 @@
 #!/usr/bin/env node
-
-
-
-var app = require('../app');
+const socket = require('../socket')();
+var app = require('../app')(socket);
+var debug = require('debug')('brainly-server:server');
+var http = require('http');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
- const http = require('http').Server(app)
- const io = require('socket.io')(http);
- 
- let questions = {}
+var server = http.createServer(app);
 
- io.on('connection', socket => {
-  
-   console.log('user connected');
+socket.initialize(server);
 
-  //  id can be subject, userId, questionId, answerId
-   socket.on('join user', (id) => {
-     console.log(`joining ${id}`);
-     socket.join(id)
-   })
- 
-   socket.on('send message', messageObj => {
-     io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
-   })
- 
-   socket.on('message typing', (messageObj, boolVal) => {
-     console.log("message typing: " + boolVal + " " + messageObj.receiverId);
-    io.to(messageObj.receiverId).emit('message typing', boolVal)
-   })
-
-   socket.on('update thread', threadObj => {
-     io.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
-   })
-
-
-   socket.on('join question', (questionId) => {
-     socket.join(questionId)
-
-    if(!questions.hasOwnProperty(questionId)){
-      questions[questionId] = {
-        questionId: questionId,
-        watchers: []
-      }
-    }
-
-    console.log("sending watchers");
-    console.log(questionId);
-    // io.emit('receive watcher',  questions[questionId])
-    io.to(questionId).emit('receive watcher',  questions[questionId])
-  })
-
-   socket.on('watch question', (questionObj, userObj) => {
-    if(!questions[questionObj.questionId]){
-      questions[questionObj.questionId] = {
-        questionId: questionObj.questionId,
-        watchers: [userObj]
-      }
-      console.log("not yet exist");
-    }
-    else{
-      questions[questionObj.questionId].watchers = [...questions[questionObj.questionId].watchers, userObj] 
-      console.log("append");
-    }
-    
-     console.log("watching question");
-     console.log(questions[questionObj.questionId]);
-     io.to(questionObj.questionId).emit('receive watcher', questions[questionObj.questionId])
-   })
-
-   socket.on('leave question', (questionId,user) => {
-    console.log("leaving question");
-    let index = questions[questionId]? questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId) : -1
-
-    if(index !== -1){
-      console.log("question exists")
-      questions[questionId].watchers.splice(index, 1)
-  
-      // socket.leave(questionId)
-      io.to(questionId).emit('receive watcher', questions[questionId])
-      console.log("sent");
-    }
-    console.log(questions[questionId]);
-   })
-
-   socket.on('join question-answer', (questionId) => {
-    socket.join(questionId)
-   })
-
-   socket.on('typing answer', (questionId, boolVal) => {
-     io.to(questionId).emit('update typing answer', boolVal)
-   })
-
-   socket.on('add answer', (answerObj) => {
-     console.log("add answer");
-     console.log(answerObj.questionId);
-    io.to(answerObj.questionId).emit('new answer', answerObj)
-  })
-
-   socket.on('join subject', (subject) => {
-     socket.join(subject)
-   })
-
-   socket.on('add question', (questionObj) => {
-     io.to(questionObj.subject).to('all').emit('new question', questionObj)
-   })
-
- })
-
-
-http.listen(3000, () => console.log("listening to port 3000"))
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -126,5 +29,45 @@ function normalizePort(val) {
   }
 
   return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
 }
 
