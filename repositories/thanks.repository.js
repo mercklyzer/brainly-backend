@@ -1,10 +1,10 @@
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-      host : 'brainly_db',
+      host : 'brainly_mysql',
       user : 'root',
       password : 'password',
-      database : 'brainly_db'
+      database : 'mydb'
     }
 });
 

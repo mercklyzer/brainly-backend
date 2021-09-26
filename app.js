@@ -25,17 +25,6 @@ module.exports = (socket) => {
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
 
-  const whitelist = ['http://localhost:4200'];
-  const corsOptions = {
-    credentials: true, // This is important.
-    origin: (origin, callback) => {
-      if(whitelist.includes(origin))
-        return callback(null, true)
-
-        callback(new Error('Not allowed by CORS'));
-    }
-  }
-
   app.use(cors());
 
   app.use(logger('dev'));
