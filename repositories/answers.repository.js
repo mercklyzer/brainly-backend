@@ -1,13 +1,4 @@
-const knex = require('knex')({
-    client: 'mysql',
-    connection: {
-      host : 'brainly_mysql',
-      user : 'root',
-      password : 'password',
-      database : 'mydb'
-    }
-});
-
+const knex = require('./knex')
 
 const repository = {
     // gets an answer by answerId
@@ -26,7 +17,7 @@ const repository = {
         })
     },
 
-    // ADDS an answer
+    // ADDS an answertrf
     addAnswer: (answer) => {
         return new Promise((fulfill, reject) => {
             const answerId = answer.answerId

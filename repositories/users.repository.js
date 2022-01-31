@@ -1,24 +1,9 @@
-const knex = require('knex')({
-    client: 'mysql',
-    connection: {
-      host : 'brainly_mysql',
-      user : 'root',
-      password : 'password',
-      database : 'mydb'
-    }
-});
-
-// const Redis = require('ioredis')
-// var redis = new Redis({
-//     port: 6379,
-//     host: "brainly_redis",
-//     password: "Password123"
-// });
+const knex = require('./knex')
 
 const repository = {
     // adds a user to the users object
     addUser: (newUser) => {
-        const userMysql = new Promise((fulfill, reject) => {
+        return new Promise((fulfill, reject) => {
             knex.raw(
                 'CALL add_user(?,?,?,?,?,?)', 
                 [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints]
@@ -51,7 +36,7 @@ const repository = {
             .catch(() => reject({message: 'Cannot add user in redis', code: 500}))
         })
 
-        return Promise.all([userMysql, userRedis]).then((res) => console.log(res))
+        return Promise.all([userMysql]).then((res) => console.log(res))
     },
 
     editUser : (userId, updatedUser) => {

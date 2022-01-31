@@ -1,9 +1,10 @@
 {
-  "name": "brainlydocker",
+  "name": "brainly",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./bin/www"
+    "start": "sh start.sh db_server:3306",
+    "build": "sh start.sh db_server:3306"
   },
   "dependencies": {
     "@types/socket.io": "^2.1.0",

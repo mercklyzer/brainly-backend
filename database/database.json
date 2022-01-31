@@ -1,11 +1,11 @@
 {
     "dev": {
         "driver": "mysql",
-        "database": { "ENV": "DB_NAME" },
-        "host": { "ENV": "DB_HOST" },
-        "port": { "ENV": "DB_PORT" },
-        "user": { "ENV": "DB_USER" },
-        "password": { "ENV": "DB_PASSWORD" },
+        "database": "brainly",
+        "host": "localhost",
+        "port": "3306",
+        "user": "root",
+        "password": "password",
         "multipleStatements": true
     }
 }
