@@ -11,4 +11,4 @@ echo "finished update database"
  
 # run node app
 echo "running node app"
-./node_modules/.bin/nodemon ./bin/www
+./node_modules/.bin/nodemon app.js

@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./app.js",
-    "build": "sh start.sh db_server:3306"
+    "start": "sh start.sh db_server:3306"
   },
   "dependencies": {
     "@types/socket.io": "^2.1.0",
