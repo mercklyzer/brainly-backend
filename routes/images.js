@@ -20,6 +20,7 @@ const uploadImage = multer({storage: storage})
 
 router.post('/', uploadImage.single('file'),(req, res, next) => {
     console.log("files route");
+    console.log(req.file);
     send.sendData(res,200,'uploaded')
     // imageController.upload(req, res)
 })
