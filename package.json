@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "sh start.sh db_server:3306",
+    "start": "node ./app.js",
     "build": "sh start.sh db_server:3306"
   },
   "dependencies": {
