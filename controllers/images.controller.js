@@ -15,9 +15,11 @@ const imageController = {
     upload: (req,res) => {
         try{
             uploadImage.single('file')
+            console.log("success");
             send.sendData(res, 200, 'Upload success')
         }
         catch(e){
+            console.log(e);
             send.sendError(res, 400, e)
         }
     }
