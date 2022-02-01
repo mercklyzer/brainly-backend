@@ -13,8 +13,13 @@ const uploadImage = multer({storage: storage})
 
 const imageController = {
     upload: (req,res) => {
-        uploadImage.single('file')
-        send.sendData(res, 200, 'Upload success')
+        try{
+            uploadImage.single('file')
+            send.sendData(res, 200, 'Upload success')
+        }
+        catch(e){
+            send.sendError(res, 400, e)
+        }
     }
 }
 
