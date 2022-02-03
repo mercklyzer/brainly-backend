@@ -26,11 +26,11 @@ const userController = {
             send.sendError(res, 409, reqBodyCheck.errorMessage)
         }
 
-        else if(!/^([a-zA-Z0-9]{5,16})$/.test(req.body.username)){
+        else if(!/^([a-zA-Z0-9]{5,16})$/.test(req.body.data.username)){
             send.sendError(res, 409, "Username should be 5-16 alphanumeric characters.")
         }
 
-        else if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(req.body.password)){
+        else if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(req.body.data.password)){
             send.sendError(res, 409, "Password should be 8-20 alphanumeric or special characters.")
         }
 
@@ -38,7 +38,7 @@ const userController = {
             send.sendError(res, 409, "User must be at least 13 years old.")
         }
 
-        else if(!/(.*?)\.(jpg|JPG|png|PNG|jpeg|JPEG)$/.test(req.body.profilePicture) && req.body.profilePicture !== ''){
+        else if(!/(.*?)\.(jpg|JPG|png|PNG|jpeg|JPEG)$/.test(req.body.data.profilePicture) && req.body.data.profilePicture !== ''){
             send.sendError(res, 409, "Accepted image formats are only jpg and png.")
         }
 
@@ -55,7 +55,6 @@ const userController = {
                     .catch(() => fulfill())
                 })
             })
-            // add som regex verification here
             .then(() => {
                 req.body.data = {
                     userId : nanoid(30),
