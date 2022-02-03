@@ -135,17 +135,18 @@ CREATE TABLE `questions` (
     `date` BIGINT(20),
     `lastEdited` BIGINT(20),
     `rewardPoints` INT NOT NULL,
-    `askerId` VARCHAR(30) NOT NULL,
+    `userId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(30) NOT NULL,
     `profilePicture` VARCHAR(500),
-    `hasBrainliest` BOOLEAN DEFAULT false,
+    `hasBrainliest` TINYINT(1) DEFAULT 0,
+    `answersCtr` INT DEFAULT 0
 
     PRIMARY KEY (`questionId`)
 );
 
 CREATE INDEX idx_date ON `questions` (`date`);
 CREATE INDEX idx_subject_date ON `questions` (`subject`, `date`);
-CREATE INDEX idx_askerId_date ON `questions` (`askerId`, `date`);
+CREATE INDEX idx_userId_date ON `questions` (`userId`, `date`);
 
 -- GETTING ALL QUESTIONS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_all_questions`;

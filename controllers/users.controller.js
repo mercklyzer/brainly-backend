@@ -38,6 +38,7 @@ const userController = {
                     .catch(() => fulfill())
                 })
             })
+            // add som regex verification here
             .then(() => {
                 req.body.data = {
                     userId : nanoid(30),
