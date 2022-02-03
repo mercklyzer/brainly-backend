@@ -16,7 +16,7 @@ module.exports = (socket) =>  {
         },
 
         addQuestion: (req, res) => {
-
+            console.log("add question");
             // change this soon ----------------------------------------------------------------------------------------------
             if(!req.body.data.question || !req.body.data.subject || !req.body.data.rewardPoints){
                 send.sendError(res,400,"Incomplete fields.")

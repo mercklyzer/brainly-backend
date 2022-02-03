@@ -28,7 +28,7 @@ let repository = {
 
     // ADDS A SINGLE QUESTION
     addQuestion: (question) => {
-        const questionMysql = new Promise((fulfill, reject) => {
+        return new Promise((fulfill, reject) => {
             console.log(question);
             knex.raw('CALL add_question(?,?,?,?,?,?,?,?)', [
                 question.questionId,question.question,question.subject,question.rewardPoints,
@@ -41,22 +41,22 @@ let repository = {
             })
         })    
         
-        const questionObj = {
-            ...question,
-            hasBrainliest: 0,
-            answers: ''
-        }
+        // const questionObj = {
+        //     ...question,
+        //     hasBrainliest: 0,
+        //     answers: ''
+        // }
 
-        const questionRedis = new Promise((fulfill,reject) => {
-            redis.hmset(`questions:${question.questionId}`, questionObj)
-            .then((res) => {
-                console.log(res);
-                fulfill(res)
-            })
-            .catch(() => reject({message: 'Cannot add question in redis', code: 500}))
-        })
+        // const questionRedis = new Promise((fulfill,reject) => {
+        //     redis.hmset(`questions:${question.questionId}`, questionObj)
+        //     .then((res) => {
+        //         console.log(res);
+        //         fulfill(res)
+        //     })
+        //     .catch(() => reject({message: 'Cannot add question in redis', code: 500}))
+        // })
 
-        return Promise.all([questionMysql, questionRedis]).then((res) => console.log(res))
+        // return Promise.all([questionMysql, questionRedis]).then((res) => console.log(res))
     },
 
     // GETS A SINGLE QUESTION BASED ON ID

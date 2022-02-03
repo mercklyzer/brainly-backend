@@ -10,6 +10,7 @@ CREATE TABLE `users` (
     `password` VARCHAR(110) NOT NULL,
     `currentPoints` INT DEFAULT 90,
     `birthday` VARCHAR(10),
+    `level` ENUM('Junior High', 'Senior High', 'College'),
 
     PRIMARY KEY (`userId`)
 );
@@ -33,11 +34,12 @@ CREATE PROCEDURE `add_user` (
     IN `p_email`  VARCHAR(64),
     IN `p_profilePicture` VARCHAR(500),
     IN `p_currentPoints` INT,
-    IN `p_birthday` VARCHAR(10)
+    IN `p_birthday` VARCHAR(10),
+    IN `p_level` ENUM('Junior High', 'Senior High', 'College')
 )
 BEGIN
-    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `currentPoints`, `birthday`) 
-    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_currentPoints`, `p_birthday`);
+    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `currentPoints`, `birthday`, `level`) 
+    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_currentPoints`, `p_birthday`, `p_level`);
 END;
 
 -- EDITING A USER PROCEDURE
@@ -140,7 +142,8 @@ CREATE TABLE `questions` (
     `askerId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(30) NOT NULL,
     `profilePicture` VARCHAR(500),
-    `hasBrainliest` BOOLEAN DEFAULT false,
+    `hasBrainliest` TINYINT(1) DEFAULT 0,
+    `answersCtr` INT NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`questionId`)
 );

@@ -5,8 +5,8 @@ const repository = {
     addUser: (newUser) => {
         return new Promise((fulfill, reject) => {
             knex.raw(
-                'CALL add_user(?,?,?,?,?,?,?)', 
-                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints, newUser.birthday]
+                'CALL add_user(?,?,?,?,?,?,?,?)', 
+                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints, newUser.birthday, newUser.level]
             )
             .then(() => fulfill())
             .catch((e) => {
@@ -60,6 +60,18 @@ const repository = {
 
     // GETS the user based on userId
     getUserByUserId: (userId) => {
+        console.log("get user by user id");
+        return new Promise((fulfill, reject) => {
+            knex.raw('CALL get_user_by_user_id(?)', [userId])
+            .then((returned) => returned[0][0].length > 0 ? fulfill(returned[0][0][0]): reject({message: 'User does not exist.', code: 404}))
+            .catch((e) => {
+                console.log(e);
+                reject({message: 'Error on getting user', code: 500})
+            })
+        })
+
+
+
         return new Promise((fulfill, reject) => {
             redis.hgetall(`users:${userId}`)
             .then((res) => {
@@ -119,7 +131,7 @@ const repository = {
     },
 
     updateCurrentPoints : (userId, points) => {
-        const userMysql = new Promise((fulfill,reject) => {
+        return new Promise((fulfill,reject) => {
             knex.raw('CALL update_user_current_points(?,?)', [userId, points])
             .then(() => fulfill())
             .catch((e) => reject({message: 'Error updating user\'s current points in mysql.', code: 500}))
@@ -137,7 +149,7 @@ const repository = {
             })
         })
 
-        return Promise.all([userMysql, userRedis])
+        return Promise.all([userMysql])
     },
 
     incrementAnswersCtr : (userId) => {
