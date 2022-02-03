@@ -9,6 +9,7 @@ CREATE TABLE `users` (
     `profilePicture` VARCHAR(500) DEFAULT '',
     `password` VARCHAR(110) NOT NULL,
     `currentPoints` INT DEFAULT 90,
+    `birthday` VARCHAR(10) NOT NULL,
 
     PRIMARY KEY (`userId`)
 );

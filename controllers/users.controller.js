@@ -6,6 +6,7 @@ const commentsRepository = require('../repositories/comments.repository')
 const thanksRepository = require('../repositories/thanks.repository')
 const jwt = require('../auth/jwt')
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 
 const send = require('./send')
 
@@ -23,6 +24,22 @@ const userController = {
 
         if(reqBodyCheck.hasMissingField){
             send.sendError(res, 409, reqBodyCheck.errorMessage)
+        }
+
+        else if(!/^([a-zA-Z0-9]{5,16})$/.test(req.body.username)){
+            send.sendError(res, 409, "Username should be 5-16 alphanumeric characters.")
+        }
+
+        else if(!/^([a-zA-Z0-9!@#$%^&*()_+\-=\[\]\\;:'",./?]{8,20})$/.test(req.body.password)){
+            send.sendError(res, 409, "Password should be 8-20 alphanumeric or special characters.")
+        }
+
+        else if(moment().diff(req.body.birthday, 'years') < 13){
+            send.sendError(res, 409, "User must be at least 13 years old.")
+        }
+
+        else if(!/(.*?)\.(jpg|JPG|png|PNG|jpeg|JPEG)$/.test(req.body.profilePicture) && req.body.profilePicture !== ''){
+            send.sendError(res, 409, "Accepted image formats are only jpg and png.")
         }
 
         else{
