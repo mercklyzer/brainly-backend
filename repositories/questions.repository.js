@@ -61,19 +61,36 @@ let repository = {
 
     // GETS A SINGLE QUESTION BASED ON ID
     getQuestionByQuestionId : (questionId) => {
+        console.log("inside repo");
         return new Promise((fulfill, reject) => {
-            redis.hgetall(`questions:${questionId}`)
-            .then((question) => {
-                console.log(question);
-                if(JSON.stringify(question) === '{}'){
-                    reject({message: "Question does not exist.", code: 404})
+            knex.raw('CALL get_question_by_question_id(?)', [questionId])
+            .then((returned) => {
+                if(returned[0][0].length > 0){
+                    fulfill(returned[0][0][0])
                 }
                 else{
-                    console.log(typeof question);
-                    fulfill(question)
+                    reject({message: "Question does not exist.", code: 404})
                 }
             })
-            .then(() => reject({message: "Error getting the question.", code: 500}))
+            .catch((e) => {
+                console.log(e);
+                reject({message: "Error getting the question.", code: 500})
+            })
+
+
+
+            // redis.hgetall(`questions:${questionId}`)
+            // .then((question) => {
+            //     console.log(question);
+            //     if(JSON.stringify(question) === '{}'){
+            //         reject({message: "Question does not exist.", code: 404})
+            //     }
+            //     else{
+            //         console.log(typeof question);
+            //         fulfill(question)
+            //     }
+            // })
+            // .then(() => reject({message: "Error getting the question.", code: 500}))
         })
     },
 

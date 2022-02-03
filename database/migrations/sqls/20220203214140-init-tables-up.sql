@@ -199,7 +199,6 @@ BEGIN
     SELECT
         `questions`.`questionId`,
         `questions`.`question`,
-        `questions`.`image`,
         `questions`.`subject`,
         `questions`.`date`,
         `questions`.`lastEdited`,

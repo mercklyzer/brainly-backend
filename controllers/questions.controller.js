@@ -55,17 +55,22 @@ module.exports = (socket) =>  {
         },
 
         getQuestion : (req, res) => {
-
+            console.log("get question");
             let questionObj
 
             questionsRepository.getQuestionByQuestionId(req.params.id)
             .then((question) => {
-                question.date = parseInt(question.date)
-                question.answersCtr = question.answers.split(',').length - 1
-                question.isUserAnswered = question.answers.includes(req.user.userId) 
-                delete question.answers
                 questionObj = question 
 
+                return answersRepository.getAnswerByQuestionIdAndUserId(req.params.id, req.user.userId)
+            })
+            .then((answers) => {
+                if(answers.length > 0){
+                    questionObj.isUserAnswered = true
+                }
+                else{
+                    questionObj.isUserAnswered = false
+                }
                 send.sendData(res,200,questionObj)
             })
             .catch((e) => send.sendError(res,e.code,e.message))
