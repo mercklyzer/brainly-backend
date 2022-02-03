@@ -9,7 +9,7 @@ CREATE TABLE `users` (
     `profilePicture` VARCHAR(500) DEFAULT '',
     `password` VARCHAR(110) NOT NULL,
     `currentPoints` INT DEFAULT 90,
-    `birthday` VARCHAR(10) NOT NULL,
+    `birthday` VARCHAR(10),
 
     PRIMARY KEY (`userId`)
 );
@@ -32,11 +32,12 @@ CREATE PROCEDURE `add_user` (
     IN `p_password` VARCHAR(110),
     IN `p_email`  VARCHAR(64),
     IN `p_profilePicture` VARCHAR(500),
-    IN `p_currentPoints` INT
+    IN `p_currentPoints` INT,
+    IN `p_birthday` VARCHAR(10)
 )
 BEGIN
-    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `currentPoints`) 
-    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_currentPoints`);
+    INSERT INTO `users` (`userId`, `username`, `password`, `email`, `profilePicture`, `currentPoints`, `birthday`) 
+    VALUES (`p_userId`, `p_username`, `p_password`, `p_email`, `p_profilePicture`, `p_currentPoints`, `p_birthday`);
 END;
 
 -- EDITING A USER PROCEDURE
@@ -136,18 +137,17 @@ CREATE TABLE `questions` (
     `date` BIGINT(20),
     `lastEdited` BIGINT(20),
     `rewardPoints` INT NOT NULL,
-    `userId` VARCHAR(30) NOT NULL,
+    `askerId` VARCHAR(30) NOT NULL,
     `username` VARCHAR(30) NOT NULL,
     `profilePicture` VARCHAR(500),
-    `hasBrainliest` TINYINT(1) DEFAULT 0,
-    `answersCtr` INT DEFAULT 0
+    `hasBrainliest` BOOLEAN DEFAULT false,
 
     PRIMARY KEY (`questionId`)
 );
 
 CREATE INDEX idx_date ON `questions` (`date`);
 CREATE INDEX idx_subject_date ON `questions` (`subject`, `date`);
-CREATE INDEX idx_userId_date ON `questions` (`userId`, `date`);
+CREATE INDEX idx_askerId_date ON `questions` (`askerId`, `date`);
 
 -- GETTING ALL QUESTIONS PROCEDURE
 DROP PROCEDURE IF EXISTS `get_all_questions`;

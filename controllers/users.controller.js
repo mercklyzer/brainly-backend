@@ -34,7 +34,7 @@ const userController = {
             send.sendError(res, 409, "Password should be 8-20 alphanumeric or special characters.")
         }
 
-        else if(moment().diff(req.body.birthday, 'years') < 13){
+        else if(moment().diff(req.body.data.birthday, 'years') < 13){
             send.sendError(res, 409, "User must be at least 13 years old.")
         }
 

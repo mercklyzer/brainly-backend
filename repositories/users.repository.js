@@ -5,8 +5,8 @@ const repository = {
     addUser: (newUser) => {
         return new Promise((fulfill, reject) => {
             knex.raw(
-                'CALL add_user(?,?,?,?,?,?)', 
-                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints]
+                'CALL add_user(?,?,?,?,?,?,?)', 
+                [newUser.userId,newUser.username, newUser.password, newUser.email, newUser.profilePicture, newUser.currentPoints, newUser.birthday]
             )
             .then(() => fulfill())
             .catch((e) => {
