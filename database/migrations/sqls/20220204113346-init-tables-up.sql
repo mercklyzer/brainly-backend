@@ -323,7 +323,7 @@ END;
 
 -- GETTING ANSWERS BY QUESTION ID
 DROP PROCEDURE IF EXISTS `get_answers_by_question_id`;
-CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30), IN `p_userId` VARCHAR(30), IN `p_offset` INT)
+CREATE PROCEDURE `get_answers_by_question_id` ( IN `p_questionId` VARCHAR(30), IN `p_userId` VARCHAR(30), IN `p_offset` INT, IN `p_limit` BIGINT unsigned)
 BEGIN
     SELECT 
         `answers`.`answerId`,
@@ -343,7 +343,7 @@ BEGIN
     FROM `answers`
     WHERE `answers`.`questionId` = `p_questionId`
     ORDER BY `answers`.`isBrainliest` DESC, `thanksCtr` DESC, `date` DESC
-    LIMIT 5 OFFSET `p_offset`;
+    LIMIT `p_limit` OFFSET `p_offset`;
 END;
 
 -- GETTING ANSWERS BY USER ID

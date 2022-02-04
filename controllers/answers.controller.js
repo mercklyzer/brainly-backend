@@ -13,7 +13,7 @@ module.exports = (socket) => {
         getAnswersByQuestionId : (req,res) => {
 
             questionsRepository.getQuestionByQuestionId(req.params.id)
-            .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId, Number(req.query.offset)))
+            .then(() => answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId, Number(req.query.offset), 2147483647))
             .then((answers) => {
                 send.sendData(res,200,answers)
             })
@@ -32,9 +32,12 @@ module.exports = (socket) => {
                 questionsRepository.getQuestionByQuestionId(req.params.id)
                 .then((question) => {
                     questionObj = question
-                    const isUserAnswered = questionObj.answers.includes(req.user.userId) || questionObj.askerId === req.user.userId
-                    
-                    return new Promise((fulfill,reject) => {
+                    return answersRepository.getAnswersByQuestionId(req.params.id, req.user.userId, 0, 2147483647)
+                })
+                .then((answers) => {
+                    return new Promise((fulfill, reject) => {
+                        // check if user owns the question or already answered the question
+                        const isUserAnswered = answers.map((answer) => answer.userId).includes(req.user.userId) || questionObj.askerId === req.user.userId
                         if(isUserAnswered){
                             reject({message: 'Either user owns the question or user already answered this question.', code: 409})
                         }
@@ -46,10 +49,7 @@ module.exports = (socket) => {
                 .then(() => usersRepository.getUserByUserId(req.user.userId))
                 .then((user) => {
                     userObj = user
-                    const updateCurrentPoints = usersRepository.updateCurrentPoints(userObj.userId, Number(userObj.currentPoints) + Number(questionObj.rewardPoints))
-                    const incrementAnswersCtr = usersRepository.incrementAnswersCtr(userObj.userId)
-                    const updateQuestionAnswers = questionsRepository.updateQuestionAnswers(req.params.id, userObj.userId)
-                    return Promise.all([updateCurrentPoints, incrementAnswersCtr, updateQuestionAnswers])
+                    return usersRepository.updateCurrentPoints(userObj.userId, userObj.currentPoints + questionObj.rewardPoints)
                 })
                 .then(() => {           
                     answer = {
@@ -66,13 +66,6 @@ module.exports = (socket) => {
                     return answersRepository.addAnswer(answer)
                 })
                 .then(() => send.sendData(res,200,answer))
-                .then(() => {
-                    answer.isBrainliest = 0
-                    answer.thanksCtr = 0
-                    answer.isUserThanked = 0
-
-                    socket.broadcastNewAnswer(answer)
-                })
                 .catch(e => send.sendError(res,e.code,e.message))
             }
 

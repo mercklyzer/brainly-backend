@@ -70,9 +70,9 @@ const repository = {
     },
 
     // GET all answers of a specific questionId
-    getAnswersByQuestionId : (questionId, userId, offset) => {
+    getAnswersByQuestionId : (questionId, userId, offset, limit) => {
         return new Promise((fulfill, reject) => {
-            knex.raw('CALL get_answers_by_question_id(?,?,?)', [questionId, userId, offset])
+            knex.raw('CALL get_answers_by_question_id(?,?,?, ?)', [questionId, userId, offset, limit])
             .then((returned) => {
                 console.log(returned);
                 // returned contains[0][0] is a list of answers
