@@ -18,18 +18,18 @@ module.exports = () => {
                 socket.join(id)
             })
             
-            socket.on('send message', messageObj => {
-                io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
-            })
+            // socket.on('send message', messageObj => {
+            //     io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
+            // })
             
             socket.on('message typing', (messageObj, boolVal) => {
                 console.log("message typing: " + boolVal + " " + messageObj.receiverId);
-            io.to(messageObj.receiverId).emit('message typing', boolVal)
+                io.to(messageObj.receiverId).emit('message typing', {threadId: messageObj.threadId, isTyping:boolVal})
             })
             
-            socket.on('update thread', threadObj => {
-                io.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
-            })
+            // socket.on('update thread', threadObj => {
+            //     io.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
+            // })
             
             
             socket.on('join question', (questionId) => {
@@ -89,29 +89,41 @@ module.exports = () => {
                 io.to(questionId).emit('update typing answer', boolVal)
             })
             
-            socket.on('add answer', (answerObj) => {
-                console.log("add answer");
-                console.log(answerObj.questionId);
-            io.to(answerObj.questionId).emit('new answer', answerObj)
-            })
+            // socket.on('add answer', (answerObj) => {
+            //     console.log("add answer");
+            //     console.log(answerObj.questionId);
+            // io.to(answerObj.questionId).emit('new answer', answerObj)
+            // })
             
             socket.on('join subject', (subject) => {
                 socket.join(subject)
             })
-            
-            socket.on('add question', (questionObj) => {
-                io.to(questionObj.subject).to('all').emit('new question', questionObj)
+
+            socket.on('leave subject', (subject) => {
+                socket.leave(subject)
             })
             
-        })
-
+            // socket.on('add question', (questionObj) => {
+            //     io.to(questionObj.subject).to('all').emit('new question', questionObj)
+            // })
+            
+        })},
+        broadcastNewQuestion: (question) => {
+            console.log("broadcasting question");
+            io.to(question.subject).to('all').emit('new question', question)
         },
         broadcastNewAnswer: (answer) => {
             console.log("broadcasting answer");
             io.to(answer.questionId).emit('new answer', answer)
+        },
+        broadcastUpdateThread: (threadObj) => {
+            console.log("update thread");
+            io.to(threadObj.user1Id).to(threadObj.user2Id).emit('receive thread', threadObj)
+        },
+        broadcastNewMessage: (messageObj) => {
+            io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
         }
+        // socket.broadcastNewMessage(messageObj)
     }
-
-
 }
 

@@ -65,6 +65,7 @@ module.exports = (socket) => {
         },
 
         addMessage: (req, res) => {
+            console.log("add message");
             let messageObj = {
                 messageId: nanoid(30),
                 ...req.body.data,
