@@ -105,6 +105,10 @@ module.exports = () => {
             
         })
 
+        },
+        broadcastNewAnswer: (answer) => {
+            console.log("broadcasting answer");
+            io.to(answer.questionId).emit('new answer', answer)
         }
     }
 

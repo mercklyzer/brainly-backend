@@ -66,6 +66,13 @@ module.exports = (socket) => {
                     return answersRepository.addAnswer(answer)
                 })
                 .then(() => send.sendData(res,200,answer))
+                .then(() => {
+                    answer.isBrainliest = 0
+                    answer.thanksCtr = 0
+                    answer.isUserThanked = 0
+
+                    socket.broadcastNewAnswer(answer)
+                })
                 .catch(e => send.sendError(res,e.code,e.message))
             }
 
