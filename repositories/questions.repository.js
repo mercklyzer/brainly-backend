@@ -144,7 +144,7 @@ let repository = {
 
     // updates information about who has the brainliest answer
     updateHasBrainliest : (questionId) => {
-        const brainliestMysql = new Promise((fulfill, reject) => {
+        return new Promise((fulfill, reject) => {
             knex.raw('CALL update_question_user_brainliest(?)', [questionId])
             .then(() => fulfill())
             .catch((e) => {

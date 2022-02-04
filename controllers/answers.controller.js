@@ -166,6 +166,7 @@ module.exports = (socket) => {
         },
 
         setBrainliest : (req, res) => {
+            console.log("set brainliest");
             let questionObj
             let answerObj
 
@@ -212,12 +213,18 @@ module.exports = (socket) => {
                 Promise.all([
                     questionsRepository.updateHasBrainliest(req.params.id), 
                     answersRepository.updateIsBrainliest(req.params.answerId),
-                    usersRepository.incrementBrainliestCtr(answerObj.userId)
+                    // usersRepository.incrementBrainliestCtr(answerObj.userId)
                 ])
                 .then(() => send.sendData(res,200,"Question has just set its brainliest answer."))
-                .catch((e) => send.sendError(res,e.code,e.message))
+                .catch((e) => {
+                    console.log(e);
+                    send.sendError(res,e.code,e.message)
+                })
             })
-            .catch((e) => send.sendError(res,e.code,e.message))
+            .catch((e) => {
+                console.log(e);
+                send.sendError(res,e.code,e.message)
+            })
         },
 
 
