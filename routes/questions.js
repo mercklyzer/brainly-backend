@@ -5,7 +5,7 @@ module.exports = (socket) => {
   var router = express.Router();
   const questionController = require('../controllers/questions.controller')(socket)
   const answerController = require('../controllers/answers.controller')(socket)
-  const commentController = require('../controllers/comments.controller')
+  const commentController = require('../controllers/comments.controller')(socket)
 
   /* -------- START OF USING QUESTION CONTROLLER -------- */
   router.get('/', function(req, res, next) {
