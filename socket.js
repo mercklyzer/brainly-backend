@@ -67,34 +67,28 @@ module.exports = () => {
             })
             
             socket.on('leave question', (questionId,user) => {
-            console.log("leaving question");
-            let index = questions[questionId]? questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId) : -1
-            
-            if(index !== -1){
-                console.log("question exists")
-                questions[questionId].watchers.splice(index, 1)
+                console.log("leaving question");
+                let index = questions[questionId]? questions[questionId].watchers.map(watcher => watcher.userId).indexOf(user.userId) : -1
                 
-                // socket.leave(questionId)
-                io.to(questionId).emit('receive watcher', questions[questionId])
-                console.log("sent");
-            }
-            console.log(questions[questionId]);
+                if(index !== -1){
+                    console.log("question exists")
+                    questions[questionId].watchers.splice(index, 1)
+                    
+                    // socket.leave(questionId)
+                    io.to(questionId).emit('receive watcher', questions[questionId])
+                    console.log("sent");
+                }
+                console.log(questions[questionId]);
             })
             
             socket.on('join question-answer', (questionId) => {
-            socket.join(questionId)
+                socket.join(questionId)
             })
             
             socket.on('typing answer', (questionId, boolVal) => {
                 io.to(questionId).emit('update typing answer', boolVal)
             })
-            
-            // socket.on('add answer', (answerObj) => {
-            //     console.log("add answer");
-            //     console.log(answerObj.questionId);
-            // io.to(answerObj.questionId).emit('new answer', answerObj)
-            // })
-            
+                        
             socket.on('join subject', (subject) => {
                 socket.join(subject)
             })
@@ -102,10 +96,11 @@ module.exports = () => {
             socket.on('leave subject', (subject) => {
                 socket.leave(subject)
             })
-            
-            // socket.on('add question', (questionObj) => {
-            //     io.to(questionObj.subject).to('all').emit('new question', questionObj)
-            // })
+
+            socket.on('typing comment', (questionId, answerId, boolVal) => {
+                io.to(questionId).emit('update typing comment', {questionId, answerId, isTyping: boolVal})
+            })
+
             
         })},
         broadcastNewQuestion: (question) => {
@@ -122,7 +117,8 @@ module.exports = () => {
         },
         broadcastNewMessage: (messageObj) => {
             io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
-        }
+        },
+        // broadcastNewComent
         // socket.broadcastNewMessage(messageObj)
     }
 }
