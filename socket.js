@@ -118,7 +118,9 @@ module.exports = () => {
         broadcastNewMessage: (messageObj) => {
             io.to(messageObj.receiverId).to(messageObj.senderId).emit('receive message', messageObj)
         },
-        // broadcastNewComent
+        broadcastNewComment: (commentObj) => {
+            io.to(commentObj.questionId).emit('new comment', commentObj)
+        } 
         // socket.broadcastNewMessage(messageObj)
     }
 }

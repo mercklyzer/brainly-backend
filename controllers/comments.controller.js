@@ -10,15 +10,22 @@ const send = require('./send')
 module.exports = (socket) => {
     return {
         getCommentsByQuestionId : (req, res) => {
+            console.log("getting comments");
             commentsRepository.getCommentsByQuestionId(req.params.id, Number(req.query.offset))
             .then((comments) => send.sendData(res,200,comments))
-            .catch((e) => send.sendError(res,400,e.message))
+            .catch((e) => {
+                console.log(e);
+                send.sendError(res,400,e.message)
+            })
         },
 
         getCommentsByAnswerId : (req, res) => {
             commentsRepository.getCommentsByAnswerId(req.params.answerId, Number(req.query.offset))
             .then((comments) => send.sendData(res,200,comments))
-            .catch((e) => send.sendError(res,400,e.message))
+            .catch((e) => {
+                console.log(e);
+                send.sendError(res,400,e.message)
+            })
         },
 
         // parent is a string that is either "question" or "answer"
@@ -62,10 +69,13 @@ module.exports = (socket) => {
                 return commentsRepository.addComment(comment)
             })
             .then(() => {
-                socket.broadcastComment(comment)
+                socket.broadcastNewComment(comment)
                 send.sendData(res,200,comment)
             })
-            .catch((e) => send.sendError(res,e.code,e.message))
+            .catch((e) => {
+                console.log(e);
+                send.sendError(res,e.code,e.message)
+            })
         },
 
         // EDITS a comment 
