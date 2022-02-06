@@ -103,7 +103,10 @@ module.exports = (socket) =>  {
                     })
                 })
                 .then(() => send.sendData(res,200,newQuestion))
-                .catch((e) => send.sendError(res,e.code,e.message))
+                .catch((e) => {
+                    console.log(e);
+                    send.sendError(res,e.code,e.message)
+                })
             }
         },
 
@@ -119,8 +122,6 @@ module.exports = (socket) =>  {
                 if(questionObj.askerId === req.user.userId){
                     console.log("check if owner");
                     return Promise.all([
-                        // answersRepository.deleteAnswersByQuestionId(questionId),
-                        // thanksRepository.deleteThanksByQuestionId(questionId),
                         commentsRepository.deleteCommentsByQuestionId(questionId),
                         questionsRepository.deleteQuestion(questionId)
                     ])
@@ -131,7 +132,7 @@ module.exports = (socket) =>  {
             })
             .then(() => send.sendData(res,200,questionObj))
             .catch((e) => {
-                console.log("error here");
+                console.log(e);
                 send.sendError(res,e.code,e.message)
             })
         },

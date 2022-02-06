@@ -96,7 +96,7 @@ let repository = {
 
     // EDITS A SINGLE QUESTION BASED ON ID
     editQuestion: (question) => {
-        const questionMysql = new Promise((fulfill, reject) => {
+        return new Promise((fulfill, reject) => {
             knex.raw('CALL edit_question(?,?,?)', [question.questionId,question.newQuestion,question.lastEdited])
             .then(() => fulfill())
             .catch(() => reject({message: 'Error editing the question.', code: 500}))
@@ -118,7 +118,7 @@ let repository = {
 
     // DELETES a question
     deleteQuestion : (questionId) => {
-        const questionMysql = new Promise((fulfill, reject) => {
+        return new Promise((fulfill, reject) => {
             knex.raw('CALL delete_question(?)', [questionId])
             .then(() => fulfill())
             .catch(() => reject({message: 'Error deleting the question in mysql.', code: 500}))
