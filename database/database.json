@@ -2,9 +2,9 @@
     "dev": {
         "driver": "mysql",
         "database": "brainly",
-        "host": "localhost",
+        "host": "brainly.ctc2j4bind7f.ap-southeast-1.rds.amazonaws.com",
         "port": "3306",
-        "user": "root",
+        "user": "admin",
         "password": "password",
         "multipleStatements": true
     }
