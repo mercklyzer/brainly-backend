@@ -11,6 +11,7 @@ const repository = {
             .then(() => fulfill())
             .catch((e) => {
                 console.log("error");
+                console.log(e);
                 console.log(e.message);
                 reject({message: e.message, code: 500})
             })
@@ -88,6 +89,8 @@ const repository = {
 
     getUserByUsername : (username) => {
         return new Promise((fulfill, reject) => {
+            console.log("getUserByUsername");
+
             knex.raw('CALL get_user_by_username(?)', [username])
             .then((returned) => {
                 if(returned[0][0].length > 0){
@@ -97,7 +100,10 @@ const repository = {
                     reject({message: 'User does not exist.', code:404})
                 }
             })
-            .catch(() => reject({message: 'Error getting the user', code: 500}))
+            .catch((err) => {
+                console.log(err);
+                reject({message: 'Error getting the user', code: 500})
+            })
         })
     },
 
