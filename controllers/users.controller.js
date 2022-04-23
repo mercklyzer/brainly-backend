@@ -83,6 +83,7 @@ const userController = {
                 send.sendData(res,200, {user: cookieUser, token: token})
             })
             .catch((e) => {
+                console.log(e);
                 send.sendError(res,e.code,e.message)
             })
         }
