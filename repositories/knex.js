@@ -3,7 +3,7 @@ const knex = require('knex')({
     connection: {
         host : "brainly.ctc2j4bind7f.ap-southeast-1.rds.amazonaws.com",
         user : "admin",
-        password : "password",
+        password : "BRAINLY123password",
         database : "brainly",
         port: 3306
     }

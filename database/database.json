@@ -5,7 +5,7 @@
         "host": "brainly.ctc2j4bind7f.ap-southeast-1.rds.amazonaws.com",
         "port": "3306",
         "user": "admin",
-        "password": "password",
+        "password": "BRAINLY123password",
         "multipleStatements": true
     }
 }
