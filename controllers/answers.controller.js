@@ -285,7 +285,10 @@ module.exports = (socket) => {
                 return thanksRepository.addThank(thankObj)
             })
             .then(() => send.sendData(res,200,thankObj))
-            .catch((e) => send.sendError(res,e.code,e.message))
+            .catch((e) => {
+                console.log(e);
+                send.sendError(res,e.code,e.message)
+            })
         }
     }
 }
