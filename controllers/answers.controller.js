@@ -286,6 +286,7 @@ module.exports = (socket) => {
             })
             .then(() => send.sendData(res,200,thankObj))
             .catch((e) => {
+                console.log("ERROR FOR ADD THANKS");
                 console.log(e);
                 send.sendError(res,e.code,e.message)
             })
