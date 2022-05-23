@@ -264,13 +264,13 @@ module.exports = (socket) => {
                     .catch(() => fulfill())
                 })
             })
-            .then(() => {
+            // .then(() => {
                 
-                return Promise.all[
-                    usersRepository.incrementThanksCtr(answerObj.userId),
-                    answersRepository.incerementThanksCtr(answerObj.answerId)
-                ]
-            })
+            //     return Promise.all[
+                    // usersRepository.incrementThanksCtr(answerObj.userId),
+            //         answersRepository.incerementThanksCtr(answerObj.answerId)
+            //     ]
+            // })
             .then(() => {
                 thankObj = {
                     thankId: nanoid(30),
