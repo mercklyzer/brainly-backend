@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "sh start.sh db_server:3306",
+    "start": "node app.js",
     "create_db": "node ./node_modules/db-migrate/bin/db-migrate create init_tables --config ./database/database.json -m ./database/migrations --sql-file"
   },
   "dependencies": {
